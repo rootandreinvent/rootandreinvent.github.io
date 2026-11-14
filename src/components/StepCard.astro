@@ -31,24 +31,22 @@ const { numeral, title, href, linkLabel } = Astro.props;
 
 <style>
   .numeral {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 999px;
-    border: 1.5px solid var(--color-gold-ink);
+    display: block;
     color: var(--color-gold-ink);
     font-family: var(--font-display);
+    font-style: italic;
     font-weight: 700;
-    font-size: 1.05rem;
-    margin-bottom: 1.1rem;
+    font-size: 2.25rem;
+    line-height: 1;
+    margin-bottom: 0.9rem;
+  }
+
+  .numeral::after {
+    content: ".";
   }
 
   :global(.tone-band) .numeral {
-    background: var(--color-gold);
-    border-color: var(--color-gold);
-    color: var(--color-band);
+    color: var(--color-gold);
   }
 
   h3 {
@@ -87,7 +85,7 @@ const { numeral, title, href, linkLabel } = Astro.props;
   .more {
     display: inline-block;
     margin-top: 1rem;
-    font-family: var(--font-display);
+    font-family: var(--font-ui);
     font-weight: 600;
     font-size: 0.95rem;
     color: var(--color-teal);

@@ -1,10 +1,12 @@
 ---
 import "@fontsource/inter/400.css";
 import "@fontsource/inter/500.css";
-import "@fontsource/space-grotesk/600.css";
-import "@fontsource/space-grotesk/700.css";
+import "@fontsource/inter/600.css";
+import "@fontsource/source-serif-4/600.css";
+import "@fontsource/source-serif-4/700.css";
+import "@fontsource/source-serif-4/600-italic.css";
 import "../styles/global.css";
-import displayFont from "@fontsource/space-grotesk/files/space-grotesk-latin-700-normal.woff2?url";
+import displayFont from "@fontsource/source-serif-4/files/source-serif-4-latin-700-normal.woff2?url";
 
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
@@ -48,7 +50,8 @@ const ogImage = new URL(url("/og.png"), Astro.site);
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="theme-color" content="#17342E" />
-    <link rel="icon" href={url("/favicon.svg")} type="image/svg+xml" />
+    <link rel="icon" href={url("/favicon-32.png")} type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href={url("/apple-touch-icon.png")} />
     <link rel="sitemap" href={url("/sitemap-index.xml")} />
     <link rel="preload" href={displayFont} as="font" type="font/woff2" crossorigin />
 
@@ -105,7 +108,7 @@ const ogImage = new URL(url("/og.png"), Astro.site);
   .draft-banner {
     background: var(--color-todo-bg);
     color: var(--color-todo-ink);
-    font-family: var(--font-display);
+    font-family: var(--font-ui);
     font-weight: 600;
     text-align: center;
     padding: 0.6rem 1rem;

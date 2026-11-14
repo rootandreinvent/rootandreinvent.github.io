@@ -17,7 +17,7 @@ const isCurrent = (href: string) => current.startsWith(url(href));
 <header class="site-header">
   <div class="container bar">
     <a class="brand" href={url("/")} aria-label="Root & Reinvent home">
-      <Wordmark variant="green" />
+      <Wordmark variant="green" compact />
     </a>
 
     <nav class="nav" aria-label="Main">
@@ -116,7 +116,7 @@ const isCurrent = (href: string) => current.startsWith(url(href));
     min-height: 44px;
     padding: 0 0.75rem;
     color: var(--color-heading);
-    font-family: var(--font-display);
+    font-family: var(--font-ui);
     font-weight: 600;
     font-size: 0.98rem;
     text-decoration: none;
@@ -178,7 +178,7 @@ const isCurrent = (href: string) => current.startsWith(url(href));
       border: 1.5px solid var(--color-border);
       border-radius: var(--radius-button);
       color: var(--color-heading);
-      font-family: var(--font-display);
+      font-family: var(--font-ui);
       font-weight: 600;
       cursor: pointer;
     }

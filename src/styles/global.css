@@ -39,7 +39,7 @@ h3,
 h4 {
   font-family: var(--font-display);
   color: var(--color-heading);
-  line-height: 1.15;
+  line-height: 1.12;
   text-wrap: balance;
   margin: 0 0 0.6em;
 }
@@ -47,13 +47,26 @@ h4 {
 h1 {
   font-size: var(--step-4);
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.015em;
 }
 
 h2 {
   font-size: var(--step-3);
   font-weight: 700;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.01em;
+}
+
+/* Gold italic accent line, as in the collateral ("Here's why."). */
+.accent {
+  display: block;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--color-gold-ink);
+}
+
+.tone-band .accent,
+.hero .accent {
+  color: var(--color-gold);
 }
 
 h3 {

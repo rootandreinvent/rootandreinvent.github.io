@@ -30,8 +30,9 @@
   --color-todo-ink: #3A2E00;
 
   /* type */
-  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Source Serif 4", ui-serif, Georgia, "Times New Roman", serif;  /* headings, numerals, wordmark */
   --font-body:    "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-ui:      var(--font-body);  /* buttons, labels, nav, eyebrows */
 
   --step--1: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
   --step-0:  clamp(1.0625rem, 1.04rem + 0.12vw, 1.125rem);

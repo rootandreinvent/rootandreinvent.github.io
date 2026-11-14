@@ -1,0 +1,36 @@
+---
+interface Props {
+  as?: "p" | "h2" | "h3";
+  id?: string;
+}
+const { as: Tag = "p", id } = Astro.props;
+---
+
+<Tag class="rule-label" id={id}><slot /></Tag>
+
+<style>
+  .rule-label {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 2.75rem 0 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-heading);
+  }
+
+  .rule-label::before,
+  .rule-label::after {
+    content: "";
+    flex: 1;
+    height: 1.5px;
+    background: var(--color-gold);
+  }
+
+  :global(.tone-band) .rule-label {
+    color: var(--color-on-band-strong);
+  }
+</style>

@@ -1,41 +1,74 @@
 ---
+import { Image } from "astro:assets";
+import mark from "../assets/logo-mark.png";
+
 interface Props {
   /** Text color: "green" for cream backgrounds, "cream" for green bands. */
   variant?: "green" | "cream";
   size?: "md" | "lg";
+  /** Hide the text below 400px, leaving only the round R&R mark. */
+  compact?: boolean;
 }
 
-const { variant = "green", size = "md" } = Astro.props;
+const { variant = "green", size = "md", compact = false } = Astro.props;
+const markSize = size === "lg" ? 56 : 40;
 ---
 
-<span class:list={["wordmark", `wordmark-${variant}`, `wordmark-${size}`]}>
-  Root <span class="amp">&amp;</span> Reinvent
+<span class:list={["wordmark", `wordmark-${variant}`, `wordmark-${size}`, { compact }]}>
+  <Image src={mark} alt="" width={markSize} height={markSize} class="mark" loading="eager" />
+  <span class="text">Root <span class="amp">&amp;</span> Reinvent</span>
 </span>
 
 <style>
   .wordmark {
-    font-family: var(--font-display);
-    font-weight: 700;
-    letter-spacing: -0.01em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
     white-space: nowrap;
     line-height: 1;
   }
-  .wordmark-md {
-    font-size: 1.25rem;
+
+  .mark {
+    flex: none;
+    border-radius: 999px;
   }
-  .wordmark-lg {
-    font-size: 1.75rem;
+
+  .text {
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
   }
-  .wordmark-green {
+
+  .wordmark-md .text {
+    font-size: 1rem;
+  }
+
+  .wordmark-lg .text {
+    font-size: 1.15rem;
+  }
+
+  .wordmark-green .text {
     color: var(--color-heading);
   }
   .wordmark-green .amp {
     color: var(--color-gold-ink);
   }
-  .wordmark-cream {
+  .wordmark-cream .text {
     color: var(--color-on-band-strong);
   }
   .wordmark-cream .amp {
     color: var(--color-gold);
+  }
+
+  @media (max-width: 399px) {
+    .compact .text {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
   }
 </style>

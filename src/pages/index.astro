@@ -1,5 +1,9 @@
 ---
+import { Image } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Swoosh from "../components/Swoosh.astro";
+import RuleLabel from "../components/RuleLabel.astro";
+import mark from "../assets/logo-mark.png";
 import Section from "../components/Section.astro";
 import Eyebrow from "../components/Eyebrow.astro";
 import Button from "../components/Button.astro";
@@ -33,6 +37,7 @@ const published = new Set((await getMethodPosts()).map((p) => p.data.slug));
       <div class="hero-copy">
         <Eyebrow>New-logo sales consulting</Eyebrow>
         <h1 id="hero-title">Closing deals takes finding deals.</h1>
+        <Swoosh />
         <p class="lede">
           I help sales reps, managers and founders land new logos with a repeatable method: researched outreach, real
           proof and a small ask.
@@ -50,16 +55,23 @@ const published = new Set((await getMethodPosts()).map((p) => p.data.slug));
 
   <Section tone="cream" labelledby="problem-title">
     <Eyebrow>The problem</Eyebrow>
-    <h2 id="problem-title">Most prospecting emails get ignored.</h2>
-    <p class="lede">They talk about the product and the seller. What gets a reply is a short note that does three things.</p>
+    <h2 id="problem-title">
+      Your cold emails aren't getting replies.
+      <span class="accent">Here's why.</span>
+    </h2>
+    <p class="lede">
+      You're talking about your product instead of your buyer. What gets a reply is a short note that does three
+      things.
+    </p>
+    <RuleLabel>The better approach</RuleLabel>
     <div class="grid grid-3 cards" data-reveal>
-      <StepCard numeral="1" title="Shows you did your homework.">
-        One specific reason you're writing to this person.
+      <StepCard numeral="1" title="Make it relevant.">
+        Show you did your homework: one specific reason you're writing to this person.
       </StepCard>
-      <StepCard numeral="2" title="Proves you've helped a company like theirs.">
-        A similar customer, a real challenge and a measurable result.
+      <StepCard numeral="2" title="Show proof.">
+        Prove you've helped a company like theirs: a similar customer, a real challenge and a measurable result.
       </StepCard>
-      <StepCard numeral="3" title="Asks for a small next step.">15 to 20 minutes, nothing bigger.</StepCard>
+      <StepCard numeral="3" title="Ask for 15 to 20 minutes.">A small next step, nothing bigger.</StepCard>
     </div>
   </Section>
 
@@ -128,7 +140,12 @@ const published = new Set((await getMethodPosts()).map((p) => p.data.slug));
 
   <Section tone="band" labelledby="guide-title" id="free-guide">
     <div class="guide">
-      <h2 id="guide-title">Get the free guide.</h2>
+      <Image src={mark} alt="" width={88} height={88} class="guide-mark" />
+      <h2 id="guide-title">
+        Want the exact template?
+        <span class="accent">Get the free cold email guide.</span>
+      </h2>
+      <Swoosh class="guide-swoosh" />
       <p class="lede">
         A template and three AI prompts that get replies. From a former sales leader who built and coached new-logo
         teams.
@@ -150,7 +167,7 @@ const published = new Set((await getMethodPosts()).map((p) => p.data.slug));
 
   .hero h1 {
     color: var(--color-on-band-strong);
-    max-width: 18ch;
+    max-width: 20ch;
   }
 
   .hero-grid {
@@ -163,8 +180,8 @@ const published = new Set((await getMethodPosts()).map((p) => p.data.slug));
 
   @media (min-width: 1024px) {
     .hero-grid {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: 3.5rem;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+      gap: 3rem;
     }
   }
 
@@ -198,5 +215,25 @@ const published = new Set((await getMethodPosts()).map((p) => p.data.slug));
 
   .guide {
     max-width: 720px;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .guide-mark {
+    margin: 0 auto 1.5rem;
+    border-radius: 999px;
+  }
+
+  .guide :global(.guide-swoosh) {
+    margin-inline: auto;
+  }
+
+  .guide .lede {
+    margin-inline: auto;
+  }
+
+  .guide :global(form) {
+    margin-inline: auto;
+    text-align: left;
   }
 </style>

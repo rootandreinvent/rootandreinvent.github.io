@@ -1,5 +1,6 @@
 ---
-import Wordmark from "./Wordmark.astro";
+import { Image } from "astro:assets";
+import badge from "../assets/logo-badge.jpg";
 import SignupForm from "./SignupForm.astro";
 import PlaceholderNote from "./PlaceholderNote.astro";
 import { site } from "../config/site";
@@ -25,7 +26,15 @@ const nav = [
 <footer class="site-footer">
   <div class="container grid-footer">
     <div class="brand-col">
-      <Wordmark variant="cream" size="lg" />
+      <Image
+        src={badge}
+        alt="Root & Reinvent. You've built it. Now grow it."
+        width={150}
+        height={150}
+        widths={[150, 300]}
+        sizes="150px"
+        class="badge"
+      />
       <p class="tagline">{site.tagline}</p>
       <p class="contact">
         <span class="contact-label">Email</span>
@@ -98,8 +107,18 @@ const nav = [
     }
   }
 
+  .badge {
+    width: 150px;
+    height: 150px;
+    border-radius: 999px;
+  }
+
   .tagline {
-    margin: 0.9rem 0 1.5rem;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin: 1rem 0 1.5rem;
     color: var(--color-on-band);
   }
 
@@ -111,7 +130,7 @@ const nav = [
   }
 
   .contact-label {
-    font-family: var(--font-display);
+    font-family: var(--font-ui);
     font-size: 0.8125rem;
     font-weight: 600;
     letter-spacing: 0.12em;
