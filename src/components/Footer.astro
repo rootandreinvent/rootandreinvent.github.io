@@ -5,6 +5,7 @@ import SignupForm from "./SignupForm.astro";
 import PlaceholderNote from "./PlaceholderNote.astro";
 import { site } from "../config/site";
 import { url } from "../lib/url";
+import { bookingHref } from "../lib/booking";
 
 interface Props {
   showSignup?: boolean;
@@ -19,7 +20,7 @@ const nav = [
   { href: "/shop/", label: "Shop" },
   { href: "/about/", label: "About" },
   { href: "/guide/", label: "Free guide" },
-  { href: "/book/", label: "Book a call" },
+  { href: bookingHref, label: "Book a call" },
 ];
 ---
 
@@ -38,7 +39,7 @@ const nav = [
       <p class="tagline">{site.tagline}</p>
       <p class="contact">
         <span class="contact-label">Email</span>
-        <span class="email">{site.email.hello}</span>
+        <a class="email" href={`mailto:${site.email.contact}`}>{site.email.contact}</a>
       </p>
       {
         site.mailingAddress ? (

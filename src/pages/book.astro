@@ -3,6 +3,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import Section from "../components/Section.astro";
 import Button from "../components/Button.astro";
 import { site } from "../config/site";
+import { bookingMailto } from "../lib/booking";
 
 const bookingUrl = site.booking.url;
 ---
@@ -28,10 +29,14 @@ const bookingUrl = site.booking.url;
           </div>
         ) : (
           <div class="fallback">
-            <p>
-              <strong>Booking opens soon.</strong> Email{" "}
+            <p>Send a short note to set up a time. The email is already filled in for you.</p>
+            <div class="button-row">
+              <Button href={bookingMailto}>Email Kelsey to book</Button>
+            </div>
+            <p class="address">
+              Or write to{" "}
               <span class="email" data-email>
-                {site.email.hello}
+                {site.email.contact}
               </span>
             </p>
             <button type="button" class="copy" data-copy hidden>
@@ -78,6 +83,14 @@ const bookingUrl = site.booking.url;
 
   .fallback p {
     margin: 0;
+  }
+
+  .fallback .button-row {
+    margin: 1.25rem 0;
+  }
+
+  .address {
+    font-size: var(--step--1);
   }
 
   .email {

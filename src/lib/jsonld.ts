@@ -10,7 +10,7 @@ export function organizationLd(base?: URL) {
     name: site.name,
     slogan: site.tagline,
     url: abs("/", base),
-    email: site.email.hello,
+    email: site.email.contact,
     founder: { "@type": "Person", name: "Kelsey Dalton" },
   };
 }
