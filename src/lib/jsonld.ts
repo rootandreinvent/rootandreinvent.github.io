@@ -6,10 +6,14 @@ const abs = (path: string, base?: URL) => new URL(url(path), base ?? site.url).t
 export function organizationLd(base?: URL) {
   return {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": "ProfessionalService",
     name: site.name,
     slogan: site.tagline,
+    description:
+      "New-logo sales consulting from Kelsey Dalton. A repeatable method for sales reps, managers and founders: researched outreach, real proof and a small ask.",
     url: abs("/", base),
+    logo: abs("/apple-touch-icon.png", base),
+    image: abs("/og.png", base),
     email: site.email.contact,
     founder: { "@type": "Person", name: "Kelsey Dalton" },
   };

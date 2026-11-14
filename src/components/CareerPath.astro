@@ -1,117 +1,194 @@
 ---
 import { career } from "../data/credentials";
+import RootLines from "./RootLines.astro";
 ---
 
-<ol class="path" role="list">
-  {
-    career.map((role, i) => (
-      <li class="role">
-        <span class="step" aria-hidden="true">{i + 1}</span>
-        <div class="body">
-          {role.context && <p class="context">{role.context}</p>}
-          <h3>{role.title}</h3>
-          {role.highlights.length > 0 && (
-            <ul class="check-list" role="list">
-              {role.highlights.map((item) => <li>{item}</li>)}
-            </ul>
-          )}
-        </div>
-      </li>
-    ))
-  }
-</ol>
+<div class="career" data-spine-track>
+  <div class="spine" aria-hidden="true">
+    <RootLines variant="spine" tone="forest" />
+  </div>
+  <ol class="path" role="list">
+    {
+      career.map((role, i) => (
+        <li class:list={["role", i % 2 === 0 ? "left" : "right", { current: i === career.length - 1 }]}>
+          <span class="node" aria-hidden="true" />
+          <article class="card" data-reveal>
+            <p class="meta">
+              <span class="years">{role.years}</span>
+              <span class="industry">{role.industry}</span>
+              {i === career.length - 1 && <span class="now">Most recent</span>}
+            </p>
+            <h3>{role.title}</h3>
+            {role.highlights.length > 0 && (
+              <ul class="check-list" role="list">
+                {role.highlights.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            )}
+          </article>
+        </li>
+      ))
+    }
+  </ol>
+</div>
 
 <style>
+  .career {
+    position: relative;
+    margin-top: 1rem;
+  }
+
+  .spine {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 28px;
+  }
+
   .path {
     list-style: none;
-    margin: 2.5rem 0 0;
-    padding: 0;
+    margin: 0;
+    padding: 0 0 0 3rem;
     display: grid;
-    gap: 1rem;
+    gap: 1.25rem;
   }
 
   .role {
     position: relative;
-    display: grid;
-    grid-template-columns: 2.75rem minmax(0, 1fr);
-    gap: 1.25rem;
   }
 
-  .role:not(:last-child)::before {
-    content: "";
+  .node {
     position: absolute;
-    left: calc(1.375rem - 1px);
-    top: 2.75rem;
-    bottom: -1rem;
-    width: 2px;
-    background: var(--color-border);
+    left: calc(-3rem + 14px - 7px);
+    top: 1.9rem;
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    background: var(--bone-50);
+    border: 1.5px solid var(--gold-700);
+    z-index: 1;
   }
 
-  .step {
-    display: grid;
-    place-items: center;
-    width: 2.75rem;
-    height: 2.75rem;
-    border-radius: 50%;
-    background: var(--color-gold);
-    color: var(--color-band);
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 1.15rem;
+  .current .node {
+    background: var(--gold-500);
+    border-color: var(--gold-500);
+    box-shadow: 0 0 0 7px color-mix(in srgb, var(--gold-500) 22%, transparent);
   }
 
-  .body {
+  @media (min-width: 1024px) {
+    .spine {
+      left: calc(50% - 14px);
+    }
+
+    .path {
+      padding: 0;
+      gap: 0;
+    }
+
+    .role {
+      width: 50%;
+    }
+
+    .role + .role {
+      margin-top: -2.5rem;
+    }
+
+    .left {
+      padding-right: 3.5rem;
+    }
+
+    .right {
+      margin-left: 50%;
+      padding-left: 3.5rem;
+    }
+
+    .left .node {
+      left: auto;
+      right: -7px;
+    }
+
+    .right .node {
+      left: -7px;
+    }
+  }
+
+  .card {
+    position: relative;
+    padding: clamp(1.4rem, 1.1rem + 1vw, 2rem);
     background: var(--color-surface);
-    border: 1.5px solid var(--color-border);
+    border: 1px solid var(--color-border);
     border-radius: var(--radius-card);
-    padding: 1.25rem clamp(1.25rem, 1rem + 1vw, 1.75rem) 0.25rem;
+    box-shadow: var(--shadow-sm);
+    transition:
+      transform 0.45s var(--ease-out),
+      box-shadow 0.45s var(--ease-out),
+      border-color 0.45s ease;
   }
 
-  .context {
-    margin: 0 0 0.25rem;
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--hairline-gold);
+  }
+
+  .current .card {
+    border-color: var(--hairline-gold);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--gold-500) 20%, transparent),
+      0 20px 60px -20px color-mix(in srgb, var(--gold-500) 45%, transparent);
+  }
+
+  :global(.js) .current .card[data-reveal] {
+    transition-delay: 0.25s;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.9rem;
+    margin: 0 0 0.75rem;
     font-family: var(--font-ui);
-    font-size: var(--step--1);
+  }
+
+  .years {
+    font-size: 0.8rem;
     font-weight: 600;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--color-teal);
+    color: var(--gold-800);
+  }
+
+  .industry,
+  .now {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.65rem;
+    border-radius: var(--radius-button);
+    border: 1px solid var(--color-border);
+    color: var(--color-body);
+  }
+
+  .now {
+    border-color: var(--hairline-gold);
+    background: color-mix(in srgb, var(--gold-500) 12%, transparent);
+    color: var(--gold-800);
   }
 
   h3 {
-    margin-bottom: 0.75rem;
+    font-size: clamp(1.4rem, 1.2rem + 0.8vw, 1.85rem);
+    font-weight: 500;
+    margin-bottom: 0.9rem;
   }
 
   h3:last-child {
-    margin-bottom: 1rem;
+    margin-bottom: 0;
   }
 
   .check-list {
-    margin-bottom: 1.25rem;
-  }
-
-  .check-list li {
-    max-width: var(--measure);
-  }
-
-  @media (max-width: 639px) {
-    .role {
-      grid-template-columns: 2rem minmax(0, 1fr);
-      gap: 0.75rem;
-    }
-
-    .role:not(:last-child)::before {
-      left: calc(1rem - 1px);
-      top: 2rem;
-    }
-
-    .step {
-      width: 2rem;
-      height: 2rem;
-      font-size: 0.95rem;
-    }
-
-    .body {
-      padding-inline: 1rem;
-    }
+    margin: 0;
+    font-size: 0.98rem;
   }
 </style>

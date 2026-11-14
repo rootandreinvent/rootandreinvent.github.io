@@ -1,6 +1,6 @@
 ---
-import Card from "./Card.astro";
-import ProductCover from "./ProductCover.astro";
+import BookMockup from "./BookMockup.astro";
+import StatusPill from "./StatusPill.astro";
 import BuyButton from "./BuyButton.astro";
 import PlaceholderNote from "./PlaceholderNote.astro";
 import { formatPrice, canCheckout } from "../lib/commerce";
@@ -25,56 +25,88 @@ interface Props {
 const { product, headingLevel: Heading = "h3" } = Astro.props;
 const live = canCheckout(product);
 const badge = !live || product.status === "coming-soon" ? "Coming soon" : product.status === "preorder" ? "Pre-order" : null;
-const priceLabel = product.price !== null ? formatPrice(product.price) : "Price coming soon";
 const pending = isPlaceholder(product.title);
 ---
 
-<Card tag="article" class="product-card">
-  <ProductCover title={product.title} subtitle={product.subtitle} />
-  <div class="meta">
-    {badge && <span class="badge">{badge}</span>}
-    <span class="price">{priceLabel}</span>
+<article class="product-card" data-reveal>
+  <div class="card-inner">
+  <div class="visual">
+    <BookMockup title={product.title} subtitle={product.subtitle} width="210px" />
   </div>
-  <Heading class="title">
-    {pending ? <PlaceholderNote text={product.title} /> : <a href={url(`/shop/${product.slug}/`)}>{product.title}</a>}
-  </Heading>
-  {isPlaceholder(product.summary) ? <PlaceholderNote text={product.summary} /> : <p>{product.summary}</p>}
-  <div class="actions">
-    <BuyButton product={product} />
+  <div class="body">
+    <div class="meta">
+      {badge && <StatusPill label={badge} />}
+      {product.price !== null && <span class="price">{formatPrice(product.price)}</span>}
+    </div>
+    <Heading class="title">
+      {pending ? <PlaceholderNote text={product.title} /> : <a href={url(`/shop/${product.slug}/`)}>{product.title}</a>}
+    </Heading>
+    {isPlaceholder(product.summary) ? <PlaceholderNote text={product.summary} /> : <p>{product.summary}</p>}
+    <div class="actions">
+      <BuyButton product={product} />
+    </div>
   </div>
-</Card>
+  </div>
+</article>
 
 <style>
+  .product-card {
+    container-type: inline-size;
+    height: 100%;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-media);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition:
+      transform 0.45s var(--ease-out),
+      box-shadow 0.45s var(--ease-out);
+  }
+
+  .card-inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .visual {
+    padding: 2.5rem 1.5rem 0.5rem;
+    background:
+      radial-gradient(70% 60% at 50% 30%, color-mix(in srgb, var(--gold-500) 10%, transparent), transparent 70%),
+      var(--bone-100);
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1.75rem;
+  }
+
   .meta {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    margin: 1.1rem 0 0.6rem;
-  }
-
-  .badge {
-    font-family: var(--font-ui);
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--color-band);
-    background: var(--hl-reason);
-    border-radius: 999px;
-    padding: 0.3rem 0.7rem;
+    margin-bottom: 1rem;
   }
 
   .price {
     font-family: var(--font-ui);
     font-weight: 600;
     font-size: 0.95rem;
-    color: var(--color-body);
+    color: var(--color-heading);
   }
 
   .title {
-    font-size: var(--step-1);
-    margin-bottom: 0.4rem;
+    font-size: var(--step-2);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
   }
 
   .title a {
@@ -84,9 +116,37 @@ const pending = isPlaceholder(product.title);
 
   .title a:hover {
     text-decoration: underline;
+    text-decoration-thickness: 1px;
   }
 
   .actions {
-    margin-top: 1.25rem;
+    margin-top: auto;
+    padding-top: 1.25rem;
   }
+  @container (min-width: 720px) {
+    .card-inner {
+      flex-direction: row;
+    }
+
+    .visual {
+      flex: 0 0 44%;
+      display: grid;
+      place-items: center;
+      padding: 3rem 2rem;
+    }
+
+    .body {
+      justify-content: center;
+      padding: clamp(2rem, 4cqi, 3.5rem);
+    }
+
+    .title {
+      font-size: var(--step-3);
+    }
+
+    .actions {
+      margin-top: 0;
+    }
+  }
+
 </style>

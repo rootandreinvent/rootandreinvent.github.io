@@ -3,10 +3,12 @@ import { url } from "../lib/url";
 
 interface Props {
   href?: string;
-  variant?: "primary" | "secondary";
+  variant?: "primary" | "secondary" | "link";
   type?: "button" | "submit";
   disabled?: boolean;
   external?: boolean;
+  /** Show the sliding arrow. Defaults on for primary and link buttons. */
+  arrow?: boolean;
   class?: string;
   [key: string]: unknown;
 }
@@ -17,12 +19,14 @@ const {
   type = "button",
   disabled = false,
   external = false,
+  arrow = variant !== "secondary",
   class: className,
   ...rest
 } = Astro.props;
 
 const classes = ["btn", `btn-${variant}`, className];
 const resolvedHref = href && !external ? url(href) : href;
+const magnetic = variant === "primary" ? { "data-magnetic": "" } : {};
 ---
 
 {
@@ -31,69 +35,169 @@ const resolvedHref = href && !external ? url(href) : href;
       class:list={classes}
       href={resolvedHref}
       {...(external ? { rel: "noopener", target: "_blank" } : {})}
+      {...magnetic}
       {...rest}
     >
-      <slot />
+      <span class="btn-label"><slot /></span>
+      {arrow && <span class="btn-arrow" aria-hidden="true" />}
     </a>
   ) : (
-    <button class:list={classes} type={type} disabled={disabled} {...rest}>
-      <slot />
+    <button class:list={classes} type={type} disabled={disabled} {...magnetic} {...rest}>
+      <span class="btn-label"><slot /></span>
+      {arrow && <span class="btn-arrow" aria-hidden="true" />}
     </button>
   )
 }
 
 <style>
   .btn {
+    --btn-bg: var(--forest-900);
+    --btn-fg: var(--bone-50);
+    --btn-border: var(--forest-900);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    min-height: 48px;
-    padding: 0.75rem 1.35rem;
+    gap: 0.65rem;
+    min-height: 50px;
+    padding: 0.8rem 1.5rem;
     border-radius: var(--radius-button);
+    border: 1px solid var(--btn-border);
+    background: var(--btn-bg);
+    color: var(--btn-fg);
     font-family: var(--font-ui);
     font-weight: 600;
     font-size: 1rem;
     line-height: 1.2;
+    letter-spacing: 0.005em;
     text-align: center;
     text-decoration: none;
     cursor: pointer;
-    border: 1.5px solid transparent;
-    transition: background-color 0.15s ease, border-color 0.15s ease;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease,
+      box-shadow 0.25s ease,
+      translate 0.35s var(--ease-out);
   }
 
   .btn-primary {
-    background: var(--color-gold);
-    color: var(--color-band);
-    border-color: var(--color-gold);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.18),
+      var(--shadow-sm);
   }
 
   .btn-primary:hover {
-    background: var(--color-gold-hover);
-    border-color: var(--color-gold-hover);
-    text-decoration: none;
+    --btn-bg: var(--forest-700);
+    --btn-border: var(--forest-700);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.18),
+      var(--shadow-md);
+  }
+
+  :global(.tone-dark) .btn-primary,
+  :global(.site-footer) .btn-primary,
+  :global(.menu-overlay) .btn-primary {
+    --btn-bg: var(--gold-500);
+    --btn-fg: var(--forest-950);
+    --btn-border: var(--gold-500);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.35),
+      0 10px 30px -12px color-mix(in srgb, var(--gold-500) 55%, transparent);
+  }
+
+  :global(.tone-dark) .btn-primary:hover,
+  :global(.site-footer) .btn-primary:hover,
+  :global(.menu-overlay) .btn-primary:hover {
+    --btn-bg: var(--gold-600);
+    --btn-border: var(--gold-600);
   }
 
   .btn-secondary {
-    background: transparent;
-    color: var(--color-heading);
-    border-color: var(--color-heading);
+    --btn-bg: transparent;
+    --btn-fg: var(--forest-900);
+    --btn-border: color-mix(in srgb, var(--forest-900) 45%, transparent);
   }
 
   .btn-secondary:hover {
-    background: color-mix(in srgb, var(--color-heading) 6%, transparent);
-    text-decoration: none;
+    --btn-border: var(--forest-900);
+    --btn-bg: color-mix(in srgb, var(--forest-900) 5%, transparent);
   }
 
-  :global(.tone-band) .btn-secondary,
+  :global(.tone-dark) .btn-secondary,
   :global(.site-footer) .btn-secondary {
-    color: var(--color-on-band-strong);
-    border-color: var(--color-on-band-strong);
+    --btn-fg: var(--bone-50);
+    --btn-border: color-mix(in srgb, var(--bone-50) 40%, transparent);
   }
 
-  :global(.tone-band) .btn-secondary:hover,
+  :global(.tone-dark) .btn-secondary:hover,
   :global(.site-footer) .btn-secondary:hover {
-    background: color-mix(in srgb, var(--color-on-band-strong) 8%, transparent);
+    --btn-border: var(--bone-50);
+    --btn-bg: color-mix(in srgb, var(--bone-50) 6%, transparent);
+  }
+
+  .btn-link {
+    --btn-bg: transparent;
+    --btn-border: transparent;
+    --btn-fg: var(--forest-900);
+    min-height: 44px;
+    padding: 0.25rem 0;
+    border-radius: 0;
+  }
+
+  .btn-link .btn-label {
+    background: linear-gradient(currentColor, currentColor) 0 100% / 0% 1px no-repeat;
+    padding-bottom: 2px;
+    transition: background-size 0.35s var(--ease-out);
+  }
+
+  .btn-link:hover .btn-label {
+    background-size: 100% 1px;
+  }
+
+  :global(.tone-dark) .btn-link {
+    --btn-fg: var(--gold-500);
+  }
+
+  .btn-arrow {
+    position: relative;
+    width: 14px;
+    height: 10px;
+    flex: none;
+    transition: transform 0.35s var(--ease-out);
+  }
+
+  .btn-arrow::before,
+  .btn-arrow::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    background: currentColor;
+  }
+
+  .btn-arrow::before {
+    width: 14px;
+    height: 1.5px;
+    transform: translateY(-50%);
+  }
+
+  .btn-arrow::after {
+    width: 7px;
+    height: 7px;
+    background: none;
+    border-top: 1.5px solid currentColor;
+    border-right: 1.5px solid currentColor;
+    transform: translateY(-50%) rotate(45deg);
+  }
+
+  .btn:hover .btn-arrow,
+  .btn:focus-visible .btn-arrow {
+    transform: translateX(4px);
+  }
+
+  .btn:focus-visible {
+    outline-offset: 3px;
+    border-radius: var(--radius-button);
   }
 
   .btn[disabled] {

@@ -75,10 +75,11 @@ const bookingUrl = site.booking.url;
 
   .fallback {
     margin-top: 2rem;
-    padding: 1.5rem 1.75rem;
+    padding: clamp(1.5rem, 1.2rem + 1.2vw, 2.5rem);
     background: var(--color-surface);
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--radius-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-media);
+    box-shadow: var(--shadow-md);
   }
 
   .fallback p {
@@ -105,7 +106,7 @@ const bookingUrl = site.booking.url;
     min-height: 44px;
     padding: 0.5rem 1rem;
     background: transparent;
-    border: 1.5px solid var(--color-heading);
+    border: 1px solid var(--color-heading);
     border-radius: var(--radius-button);
     color: var(--color-heading);
     font-family: var(--font-ui);

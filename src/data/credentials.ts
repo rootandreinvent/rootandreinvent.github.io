@@ -1,6 +1,7 @@
 export type Role = {
   title: string;
-  context?: string;
+  years: string;
+  industry: string;
   highlights: string[];
 };
 
@@ -9,7 +10,8 @@ export type Build = { title: string; body: string };
 export const career: Role[] = [
   {
     title: "Sales and Customer Service Manager",
-    context: "Manufacturing · 2014–2018",
+    years: "2014–2018",
+    industry: "Manufacturing",
     highlights: [
       "Promoted twice in four years, from inside sales rep to sales supervisor to manager.",
       "Rebuilt the customer journey and built a consumer business line that grew to 30% of sales.",
@@ -17,7 +19,8 @@ export const career: Role[] = [
   },
   {
     title: "Business Development Rep, Enterprise Accounts",
-    context: "Enterprise technology · 2018–2019",
+    years: "2018–2019",
+    industry: "Enterprise technology",
     highlights: [
       "300% of quota and 180% of pipeline target.",
       "Named team MVP, team lead and the team's first enablement lead.",
@@ -25,7 +28,8 @@ export const career: Role[] = [
   },
   {
     title: "Account Executive, Small Business",
-    context: "2019–2020",
+    years: "2019–2020",
+    industry: "Enterprise technology",
     highlights: [
       "211% of new-business target, with 22 new logos in one year.",
       "31% close rate, with about half of her bookings self-sourced.",
@@ -33,7 +37,8 @@ export const career: Role[] = [
   },
   {
     title: "Account Executive, Growth Business",
-    context: "2020–2022",
+    years: "2020–2022",
+    industry: "Enterprise technology",
     highlights: [
       "Promoted to senior account executive after one year as an AE.",
       "Closed the most new logos in her sales organization.",
@@ -43,7 +48,8 @@ export const career: Role[] = [
   },
   {
     title: "Manager, Strategic Commercial Sales",
-    context: "2022–2024",
+    years: "2022–2024",
+    industry: "Enterprise technology",
     highlights: [
       "Promoted twice in her first year as a manager, from velocity SMB to corporate to strategic sales.",
       "Built the company's first SMB sales team and its first strategic team.",
@@ -54,7 +60,8 @@ export const career: Role[] = [
   },
   {
     title: "Regional Sales Director, SMB",
-    context: "2024–2026",
+    years: "2024–2026",
+    industry: "Enterprise technology",
     highlights: [
       "Ran joint pursuits that paired integration and AI products with the core platform.",
       "Credited by her account executive as critical to closing a multi-product new-logo win.",
@@ -62,7 +69,8 @@ export const career: Role[] = [
   },
   {
     title: "Regional Sales Director, New Logo Commercial Growth",
-    context: "2026",
+    years: "2026",
+    industry: "Enterprise technology",
     highlights: [
       "Coached the rep chosen for the best pitch in the entire sales organization.",
       "Won the managers' weekly contest for closed new business.",
@@ -72,7 +80,8 @@ export const career: Role[] = [
   },
   {
     title: "Senior Director, Marketplace Sales",
-    context: "Manufacturing technology · 2026",
+    years: "2026",
+    industry: "Manufacturing technology",
     highlights: [],
   },
 ];

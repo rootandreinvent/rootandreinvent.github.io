@@ -1,58 +1,87 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Section from "../components/Section.astro";
+import SectionHeader from "../components/SectionHeader.astro";
+import PageHero from "../components/PageHero.astro";
 import Eyebrow from "../components/Eyebrow.astro";
 import BookCallButton from "../components/BookCallButton.astro";
 import PlaceholderNote from "../components/PlaceholderNote.astro";
 import Faq from "../components/Faq.astro";
 import { getServices } from "../lib/content";
-import { isPlaceholder } from "../lib/placeholders";
+import { isPlaceholder, showPending } from "../lib/placeholders";
 import { formatPrice } from "../lib/commerce";
 import { workWithMeFaq } from "../data/faq";
 
 const services = await getServices();
+const showFaq = showPending || workWithMeFaq.some((item) => item.a);
+
+const steps = [
+  { title: "Book a call", body: "15 to 20 minutes to see if it's a fit." },
+  { title: "Scope", body: "We agree on what we'll work on." },
+  { title: "Start", body: "We get to work." },
+];
 ---
 
 <BaseLayout
   title="Work with me"
   description="1:1 coaching, team workshops and fractional sales leadership for new-logo sales. Book a 15 to 20 minute call with Kelsey Dalton."
+  overlayHeader
 >
-  <Section tone="band" labelledby="wwm-title">
-    <h1 id="wwm-title">Work with me</h1>
-    <p class="lede">
+  <PageHero id="wwm-title" eyebrow="Work with me">
+    Work <em>with me</em>
+    <p slot="lead">
       I've built new-logo teams, coached reps from their first email to their first big win, and run the cadences that
       keep a team finding deals. Here's how I can help yours.
     </p>
-    <div class="button-row">
-      <BookCallButton />
+    <BookCallButton slot="actions" />
+  </PageHero>
+
+  <nav class="subnav" aria-label="Services" data-subnav>
+    <div class="container subnav-inner">
+      <ul role="list">
+        {
+          services.map((service) => (
+            <li>
+              <a href={`#${service.slug}`} data-spy={service.slug}>
+                {service.title}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
     </div>
-  </Section>
+  </nav>
 
   {
     services.map((service, i) => (
-      <Section tone={i % 2 === 0 ? "cream" : "bordered"} id={service.slug} labelledby={`${service.slug}-title`}>
+      <Section tone={i % 2 === 0 ? "cream" : "bone"} id={service.slug} labelledby={`${service.slug}-title`}>
         <div class="service">
-          <div>
-            <Eyebrow>Service {i + 1} of {services.length}</Eyebrow>
+          <div class="service-intro" data-reveal>
+            <Eyebrow>
+              Service {i + 1} of {services.length}
+            </Eyebrow>
             <h2 id={`${service.slug}-title`}>{service.title}</h2>
             <p class="lede">{service.summary}</p>
-          </div>
-          <dl class="details">
-            <div>
-              <dt>Who it's for</dt>
-              <dd>{service.audience}</dd>
+            <p class="audience">
+              <span class="label">Who it's for</span>
+              {service.audience}
+            </p>
+            <div class="button-row">
+              <BookCallButton />
             </div>
-            <div>
+          </div>
+          <dl class="details" data-reveal>
+            <div class="detail">
               <dt>What we work on</dt>
               <dd>
-                <ul class="check-list">
+                <ul class="check-list" role="list">
                   {service.workOn.map((item) => (
                     <li>{item}</li>
                   ))}
                 </ul>
               </dd>
             </div>
-            <div>
+            <div class="detail">
               <dt>How it works</dt>
               <dd>
                 {isPlaceholder(service.format) ? (
@@ -64,63 +93,303 @@ const services = await getServices();
                 )}
               </dd>
             </div>
-            <div>
+            <div class="detail">
               <dt>Investment</dt>
               <dd>{service.price !== null ? formatPrice(service.price) : "Pricing on request"}</dd>
             </div>
           </dl>
-          <div class="cta">
-            <BookCallButton />
-          </div>
         </div>
       </Section>
     ))
   }
 
-  <Section tone="cream">
-    <Faq items={workWithMeFaq} />
+  <Section tone="band" labelledby="process-title">
+    <SectionHeader id="process-title" eyebrow="The process">
+      How engagements <em>work.</em>
+    </SectionHeader>
+    <ol class="process" role="list" data-reveal-group>
+      {
+        steps.map((step, i) => (
+          <li class="process-step" data-reveal>
+            <span class="process-num" aria-hidden="true">
+              0{i + 1}
+            </span>
+            <h3>{step.title}</h3>
+            <p>{step.body}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </Section>
+
+  {
+    showFaq && (
+      <Section tone="cream">
+        <Faq items={workWithMeFaq} />
+      </Section>
+    )
+  }
+
+  <Section tone="deep" labelledby="cta-title" glow class="cta-band">
+    <div class="cta" data-reveal>
+      <Eyebrow>Next step</Eyebrow>
+      <h2 id="cta-title" class="display">Book a <em>15 to 20 minute</em> call.</h2>
+      <div class="button-row">
+        <BookCallButton label="Book a call" />
+      </div>
+    </div>
   </Section>
 </BaseLayout>
 
+<script>
+  const links = [...document.querySelectorAll<HTMLAnchorElement>("[data-spy]")];
+  if (links.length && "IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          links.forEach((link) => {
+            const active = link.dataset.spy === entry.target.id;
+            link.classList.toggle("is-active", active);
+            if (active) link.setAttribute("aria-current", "true");
+            else link.removeAttribute("aria-current");
+          });
+        });
+      },
+      { rootMargin: "-35% 0px -60% 0px" },
+    );
+    links.forEach((link) => {
+      const target = document.getElementById(link.dataset.spy ?? "");
+      if (target) observer.observe(target);
+    });
+  }
+</script>
+
 <style>
-  .service {
-    display: grid;
-    gap: 2rem;
+  .subnav {
+    position: sticky;
+    top: var(--header-h);
+    z-index: 40;
+    background: color-mix(in srgb, var(--bone-50) 88%, transparent);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--hairline-light);
+    transition: top 0.45s var(--ease-out);
   }
 
-  @media (min-width: 900px) {
+  :global(body:has(.site-header.is-hidden)) .subnav,
+  :global(body:has(.site-header:not(.is-scrolled))) .subnav {
+    top: 0;
+  }
+
+  .subnav-inner {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .subnav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+
+  .subnav a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 56px;
+    padding: 0 1rem;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--color-body);
+    text-decoration: none;
+  }
+
+  .subnav li:first-child a {
+    padding-left: 0;
+  }
+
+  .subnav a::after {
+    content: "";
+    position: absolute;
+    left: 1rem;
+    right: 1rem;
+    bottom: -1px;
+    height: 2px;
+    background: var(--gold-500);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  .subnav li:first-child a::after {
+    left: 0;
+  }
+
+  .subnav a:hover,
+  .subnav a.is-active {
+    color: var(--color-heading);
+  }
+
+  .subnav a.is-active::after {
+    transform: scaleX(1);
+  }
+
+  .service {
+    display: grid;
+    gap: 3rem;
+  }
+
+  @media (min-width: 1024px) {
     .service {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
-      column-gap: 4rem;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: clamp(3rem, 7vw, 7rem);
+      align-items: start;
     }
 
-    .cta {
-      grid-column: 2;
+    .service-intro {
+      position: sticky;
+      top: calc(var(--header-h) + 6rem);
     }
+  }
+
+  .service h2 {
+    margin-bottom: 1.25rem;
+  }
+
+  .audience {
+    margin-top: 1.75rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--hairline-light);
+    color: var(--color-heading);
+  }
+
+  .label,
+  dt {
+    display: block;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-800);
+    margin-bottom: 0.5rem;
   }
 
   .details {
     margin: 0;
     display: grid;
-    gap: 1.5rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-media);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
   }
 
-  dt {
-    font-family: var(--font-ui);
-    font-weight: 600;
-    font-size: 0.8125rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-teal);
-    margin-bottom: 0.4rem;
+  .detail {
+    padding: clamp(1.5rem, 1.2rem + 1vw, 2.25rem);
+  }
+
+  .detail + .detail {
+    border-top: 1px solid var(--color-border);
   }
 
   dd {
     margin: 0;
-    color: var(--color-heading);
+    color: var(--color-strong);
   }
 
   dd .check-list {
     margin: 0;
+  }
+
+  .process {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 2rem;
+    counter-reset: step;
+  }
+
+  @media (min-width: 768px) {
+    .process {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0;
+    }
+  }
+
+  .process-step {
+    position: relative;
+    padding-top: 2rem;
+    border-top: 1px solid var(--hairline-gold);
+  }
+
+  @media (min-width: 768px) {
+    .process-step {
+      padding-right: 2.5rem;
+    }
+
+    .process-step:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      top: -5px;
+      right: 2.5rem;
+      width: 9px;
+      height: 9px;
+      border-top: 1px solid var(--gold-500);
+      border-right: 1px solid var(--gold-500);
+      transform: rotate(45deg);
+    }
+  }
+
+  .process-step::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    left: 0;
+    width: 11px;
+    height: 11px;
+    border-radius: 999px;
+    background: var(--gold-500);
+  }
+
+  .process-num {
+    display: block;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--gold-500);
+    margin-bottom: 0.75rem;
+  }
+
+  .process-step h3 {
+    font-size: clamp(1.75rem, 1.4rem + 1vw, 2.25rem);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  .process-step p {
+    margin: 0;
+    color: var(--color-on-band);
+  }
+
+  .cta {
+    text-align: center;
+    display: grid;
+    justify-items: center;
+  }
+
+  .cta h2 {
+    font-size: clamp(2.75rem, 5vw + 1rem, 6rem);
+    max-width: 16ch;
+  }
+
+  .cta :global(.eyebrow) {
+    justify-content: center;
   }
 </style>

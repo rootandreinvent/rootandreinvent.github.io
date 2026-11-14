@@ -3,6 +3,7 @@ import { Image } from "astro:assets";
 import badge from "../assets/logo-badge.jpg";
 import SignupForm from "./SignupForm.astro";
 import PlaceholderNote from "./PlaceholderNote.astro";
+import RootLines from "./RootLines.astro";
 import { site } from "../config/site";
 import { url } from "../lib/url";
 import { bookingHref } from "../lib/booking";
@@ -14,134 +15,190 @@ interface Props {
 const { showSignup = true } = Astro.props;
 const year = new Date().getFullYear();
 
-const nav = [
+const explore = [
   { href: "/work-with-me/", label: "Work with me" },
   { href: "/method/", label: "Method" },
   { href: "/shop/", label: "Shop" },
   { href: "/about/", label: "About" },
+];
+
+const start = [
   { href: "/guide/", label: "Free guide" },
   { href: bookingHref, label: "Book a call" },
 ];
+
+const [before, after] = site.tagline.split("finding");
 ---
 
-<footer class="site-footer">
-  <div class="container grid-footer">
-    <div class="brand-col">
-      <Image
-        src={badge}
-        alt="Root & Reinvent. You've built it. Now grow it."
-        width={150}
-        height={150}
-        widths={[150, 300]}
-        sizes="150px"
-        class="badge"
-      />
-      <p class="tagline">{site.tagline}</p>
-      <p class="contact">
-        <span class="contact-label">Email</span>
-        <a class="email" href={`mailto:${site.email.contact}`}>{site.email.contact}</a>
-      </p>
-      {
-        site.mailingAddress ? (
-          <p class="address">{site.mailingAddress}</p>
-        ) : (
-          <PlaceholderNote text="[TODO: mailing address (PO box or virtual mailbox)]" />
-        )
-      }
-    </div>
-
-    <nav class="footer-nav" aria-label="Footer">
-      <ul role="list">
-        {
-          nav.map((item) => (
-            <li>
-              <a href={url(item.href)}>{item.label}</a>
-            </li>
-          ))
-        }
-      </ul>
-    </nav>
-
-    <div class="signup-col">
-      {
-        showSignup ? (
-          <>
-            <p class="signup-title">Get the free guide</p>
-            <SignupForm source="footer" compact />
-          </>
-        ) : (
-          <>
-            <p class="signup-title">Get the free guide</p>
-            <p>A template and three AI prompts that get replies.</p>
-            <a href={url("/guide/")}>Get the free guide &rarr;</a>
-          </>
-        )
-      }
-    </div>
+<footer class="site-footer tone-dark grain">
+  <div class="divider">
+    <RootLines variant="divider" tone="gold" />
   </div>
 
-  <div class="container legal">
-    <p>&copy; {year} Root &amp; Reinvent</p>
-    <ul role="list">
-      <li><a href={url("/privacy/")}>Privacy</a></li>
-      <li><a href={url("/terms/")}>Terms</a></li>
-    </ul>
+  <div class="container">
+    <p class="closing" data-reveal>
+      {before}<em>finding</em>{after}
+    </p>
+
+    <div class="grid-footer">
+      <div class="brand-col">
+        <Image
+          src={badge}
+          alt="Root & Reinvent. You've built it. Now grow it."
+          width={112}
+          height={112}
+          widths={[112, 224, 336]}
+          sizes="112px"
+          class="badge"
+        />
+        <p class="contact">
+          <span class="col-title">Email</span>
+          <a class="email" href={`mailto:${site.email.contact}`}>{site.email.contact}</a>
+        </p>
+        {
+          site.mailingAddress ? (
+            <p class="address">{site.mailingAddress}</p>
+          ) : (
+            <PlaceholderNote text="[TODO: mailing address (PO box or virtual mailbox)]" />
+          )
+        }
+      </div>
+
+      <nav class="footer-nav" aria-label="Footer">
+        <div>
+          <p class="col-title">Explore</p>
+          <ul role="list">
+            {
+              explore.map((item) => (
+                <li>
+                  <a href={url(item.href)}>{item.label}</a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        <div>
+          <p class="col-title">Start here</p>
+          <ul role="list">
+            {
+              start.map((item) => (
+                <li>
+                  <a href={url(item.href)}>{item.label}</a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </nav>
+
+      <div class="signup-col">
+        <p class="col-title">Get the free guide</p>
+        {
+          showSignup ? (
+            <SignupForm source="footer" compact />
+          ) : (
+            <>
+              <p>A template and three AI prompts that get replies.</p>
+              <a class="guide-link" href={url("/guide/")}>
+                Get the free guide <span aria-hidden="true">&rarr;</span>
+              </a>
+            </>
+          )
+        }
+      </div>
+    </div>
+
+    <div class="legal">
+      <p>&copy; {year} Root &amp; Reinvent</p>
+      <ul role="list">
+        <li><a href={url("/privacy/")}>Privacy</a></li>
+        <li><a href={url("/terms/")}>Terms</a></li>
+      </ul>
+    </div>
   </div>
 </footer>
 
 <style>
   .site-footer {
-    background: var(--color-band);
+    position: relative;
+    background: var(--forest-950);
     color: var(--color-on-band);
-    padding-block: 4rem 2rem;
-    border-top: 1.5px solid var(--color-band-border);
+    padding-block: 0 2rem;
+    overflow: hidden;
+  }
+
+  .divider {
+    height: 56px;
+    margin-bottom: clamp(3rem, 6vw, 5rem);
+  }
+
+  .closing {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(2.5rem, 6vw + 0.5rem, 6rem);
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    color: var(--bone-50);
+    max-width: 14ch;
+    margin: 0 0 clamp(3rem, 6vw, 5rem);
+    text-wrap: balance;
+  }
+
+  .closing em {
+    color: var(--gold-500);
   }
 
   .grid-footer {
     display: grid;
-    gap: 2.5rem;
+    gap: 2.75rem;
+    padding-top: 3rem;
+    border-top: 1px solid var(--hairline-dark);
   }
 
   @media (min-width: 900px) {
     .grid-footer {
-      grid-template-columns: 1.1fr 0.7fr 1.4fr;
+      grid-template-columns: 1fr 1.1fr 1.3fr;
+      gap: 3rem;
     }
   }
 
   .badge {
-    width: 150px;
-    height: 150px;
+    width: 112px;
+    height: 112px;
     border-radius: 999px;
+    margin-bottom: 1.5rem;
   }
 
-  .tagline {
-    font-family: var(--font-display);
-    font-style: italic;
+  .col-title {
+    font-family: var(--font-ui);
+    font-size: 0.78rem;
     font-weight: 600;
-    font-size: 1.1rem;
-    margin: 1rem 0 1.5rem;
-    color: var(--color-on-band);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-500);
+    margin: 0 0 0.75rem;
   }
 
   .contact {
     display: flex;
     flex-direction: column;
-    gap: 0.15rem;
     margin: 0 0 0.75rem;
   }
 
-  .contact-label {
-    font-family: var(--font-ui);
-    font-size: 0.8125rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-gold);
+  .contact .col-title {
+    margin-bottom: 0;
   }
 
   .email {
-    color: var(--color-on-band-strong);
+    color: var(--bone-50);
     user-select: all;
+    overflow-wrap: anywhere;
+  }
+
+  .footer-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem;
   }
 
   .footer-nav ul,
@@ -151,29 +208,30 @@ const nav = [
     padding: 0;
   }
 
-  .footer-nav ul {
-    display: grid;
-    gap: 0.1rem;
-  }
-
   .site-footer a {
-    color: var(--color-on-band-strong);
+    color: var(--bone-50);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     min-height: 44px;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0 1px;
+    background-position: 0 85%;
+    background-repeat: no-repeat;
+    transition: background-size 0.35s var(--ease-out);
   }
 
   .site-footer a:hover {
-    text-decoration: underline;
+    background-size: 100% 1px;
   }
 
-  .signup-title {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: var(--step-1);
-    color: var(--color-on-band-strong);
-    margin: 0 0 0.75rem;
+  .guide-link {
+    gap: 0.4rem;
+    font-weight: 600;
+  }
+
+  .signup-col p:not(.col-title) {
+    margin: 0 0 0.25rem;
   }
 
   .legal {
@@ -182,10 +240,11 @@ const nav = [
     justify-content: space-between;
     align-items: center;
     gap: 1rem;
-    margin-top: 3rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--color-band-border);
+    margin-top: 3.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--hairline-dark);
     font-size: var(--step--1);
+    color: var(--color-on-band);
   }
 
   .legal p {
@@ -194,6 +253,6 @@ const nav = [
 
   .legal ul {
     display: flex;
-    gap: 1.25rem;
+    gap: 1.5rem;
   }
 </style>

@@ -1,6 +1,8 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Section from "../../components/Section.astro";
+import SectionHeader from "../../components/SectionHeader.astro";
+import PageHero from "../../components/PageHero.astro";
 import ProductCard from "../../components/ProductCard.astro";
 import SignupForm from "../../components/SignupForm.astro";
 import { getProducts } from "../../lib/content";
@@ -12,20 +14,26 @@ const products = await getProducts();
   title="Shop"
   description="Tools from the Repeat Success Method, starting with the new-logo playbook. Join the waitlist to hear when it launches."
   footerSignup={false}
+  overlayHeader
 >
-  <Section tone="cream" labelledby="shop-title">
-    <h1 id="shop-title">Shop</h1>
-    <p class="lede">Tools from the Repeat Success Method. More on the way.</p>
+  <PageHero id="shop-title" eyebrow="Shop">
+    <em>Shop</em>
+    <p slot="lead">Tools from the Repeat Success Method. More on the way.</p>
+  </PageHero>
 
-    <div class="grid grid-3 products">
-      {products.map((product) => <ProductCard product={product} headingLevel="h2" />)}
+  <Section tone="cream" labelledby="products-title">
+    <h2 id="products-title" class="visually-hidden">Products</h2>
+    <div class="products" data-reveal-group>
+      {products.map((product) => <ProductCard product={product} headingLevel="h3" />)}
     </div>
   </Section>
 
-  <Section tone="band" labelledby="waitlist-title" id="waitlist">
-    <div class="waitlist">
-      <h2 id="waitlist-title">Hear when products launch.</h2>
-      <p class="lede">One email when something new is ready.</p>
+  <Section tone="deep" labelledby="waitlist-title" id="waitlist" glow>
+    <div class="waitlist" data-reveal>
+      <SectionHeader id="waitlist-title" eyebrow="Waitlist">
+        Hear when products <em>launch.</em>
+        <p slot="lead">One email when something new is ready.</p>
+      </SectionHeader>
       <SignupForm source="shop-waitlist" tag="waitlist" buttonLabel="Join the waitlist" />
     </div>
   </Section>
@@ -33,10 +41,12 @@ const products = await getProducts();
 
 <style>
   .products {
-    margin-top: 2.5rem;
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
   }
 
   .waitlist {
-    max-width: 720px;
+    max-width: 760px;
   }
 </style>

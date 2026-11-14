@@ -1,0 +1,226 @@
+---
+/* One shared player for every <BrandVideo /> on the page. */
+---
+
+<dialog class="video-lightbox" aria-label="Video player" data-lightbox>
+  <div class="stage" data-stage>
+    <button class="close" type="button" data-lightbox-close>
+      <span class="close-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Close video</span>
+    </button>
+    <div class="screen" data-screen></div>
+    <p class="fallback" data-fallback hidden>Video available soon</p>
+  </div>
+</dialog>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>("[data-lightbox]");
+  const stage = dialog?.querySelector<HTMLElement>("[data-stage]");
+  const screen = dialog?.querySelector<HTMLElement>("[data-screen]");
+  const fallback = dialog?.querySelector<HTMLElement>("[data-fallback]");
+  const closeBtn = dialog?.querySelector<HTMLButtonElement>("[data-lightbox-close]");
+  let opener: HTMLElement | null = null;
+
+  if (dialog && stage && screen && fallback && closeBtn) {
+    const open = (trigger: HTMLElement) => {
+      const { src, poster, captions, title, aspect } = trigger.dataset;
+      if (!src) return;
+      opener = trigger;
+      screen.replaceChildren();
+      fallback.hidden = true;
+      stage.dataset.aspect = aspect ?? "16/9";
+
+      const video = document.createElement("video");
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = "none";
+      video.autoplay = true;
+      if (poster) video.poster = poster;
+      video.setAttribute("aria-label", title ?? "Video");
+      video.src = src;
+      if (captions) {
+        // Captions are burned into the picture, so the track is available but off by default.
+        const track = document.createElement("track");
+        track.kind = "captions";
+        track.src = captions;
+        track.srclang = "en";
+        track.label = "English";
+        video.append(track);
+      }
+      video.addEventListener(
+        "error",
+        () => {
+          video.remove();
+          if (poster) {
+            const img = document.createElement("img");
+            img.src = poster;
+            img.alt = "";
+            screen.append(img);
+          }
+          fallback.hidden = false;
+          closeBtn.focus();
+          trigger.closest("[data-brand-video]")?.classList.add("is-missing");
+        },
+        { once: true },
+      );
+      screen.append(video);
+
+      dialog.showModal();
+      document.body.classList.add("menu-open");
+      video.play().catch(() => {});
+      video.focus();
+    };
+
+    document.addEventListener("click", (event) => {
+      const trigger = (event.target as HTMLElement).closest<HTMLElement>("[data-play]");
+      if (!trigger) return;
+      event.preventDefault();
+      open(trigger);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      const trigger = (event.target as HTMLElement).closest?.<HTMLElement>("[data-play]");
+      if (trigger && event.key === " ") {
+        event.preventDefault();
+        open(trigger);
+      }
+    });
+
+    document.querySelectorAll<HTMLElement>("[data-play]").forEach((el) => el.setAttribute("role", "button"));
+
+    closeBtn.addEventListener("click", () => dialog.close());
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+    dialog.addEventListener("close", () => {
+      screen.querySelector("video")?.pause();
+      screen.replaceChildren();
+      document.body.classList.remove("menu-open");
+      opener?.focus();
+    });
+  }
+</script>
+
+<style>
+  .video-lightbox {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: clamp(1rem, 4vw, 3rem);
+    border: 0;
+    background: transparent;
+    display: none;
+    place-items: center;
+  }
+
+  .video-lightbox[open] {
+    display: grid;
+    animation: fade-in 0.35s var(--ease-out);
+  }
+
+  .video-lightbox::backdrop {
+    background: color-mix(in srgb, var(--forest-950) 92%, transparent);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+
+  .stage {
+    position: relative;
+    width: min(100%, 1280px, calc((100svh - 8rem) * 16 / 9));
+  }
+
+  .stage[data-aspect="4/5"] {
+    width: min(100%, 560px, calc((100svh - 8rem) * 4 / 5));
+  }
+
+  .screen {
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-media);
+    overflow: hidden;
+    background: var(--forest-950);
+    border: 1px solid var(--hairline-gold);
+    box-shadow: 0 50px 100px -40px rgb(0 0 0 / 0.8);
+  }
+
+  .stage[data-aspect="4/5"] .screen {
+    aspect-ratio: 4 / 5;
+  }
+
+  .screen :global(video),
+  .screen :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  .screen :global(img) {
+    object-fit: cover;
+    opacity: 0.6;
+  }
+
+  .close {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 0.75rem);
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    border: 1px solid var(--hairline-dark);
+    background: color-mix(in srgb, var(--forest-950) 70%, transparent);
+    color: var(--bone-50);
+    cursor: pointer;
+  }
+
+  .close:hover {
+    border-color: var(--gold-500);
+  }
+
+  .close-icon {
+    position: relative;
+    width: 16px;
+    height: 16px;
+  }
+
+  .close-icon::before,
+  .close-icon::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 16px;
+    height: 1.5px;
+    background: currentColor;
+    transform: rotate(45deg);
+  }
+
+  .close-icon::after {
+    transform: rotate(-45deg);
+  }
+
+  .fallback {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius-button);
+    font-family: var(--font-ui);
+    font-weight: 600;
+    color: var(--bone-50);
+    background: color-mix(in srgb, var(--forest-950) 85%, transparent);
+    border: 1px solid var(--hairline-gold);
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+  }
+</style>

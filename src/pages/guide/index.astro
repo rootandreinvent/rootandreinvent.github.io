@@ -1,69 +1,155 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Section from "../../components/Section.astro";
-import Eyebrow from "../../components/Eyebrow.astro";
+import SectionHeader from "../../components/SectionHeader.astro";
+import PageHero from "../../components/PageHero.astro";
 import SignupForm from "../../components/SignupForm.astro";
 import BrandVideo from "../../components/BrandVideo.astro";
+import GuideMockup from "../../components/GuideMockup.astro";
 import PlaceholderNote from "../../components/PlaceholderNote.astro";
+import Icon from "../../components/Icon.astro";
 import { videoProps } from "../../lib/video";
+
+const points = [
+  { icon: "mail" as const, text: "Why outreach fails before the first call" },
+  { icon: "layers" as const, text: "How to tier your accounts so you chase the right ones" },
+  { icon: "check" as const, text: "One thing to do today" },
+];
 ---
 
 <BaseLayout
   title="Free guide"
   description="A free guide for new-logo sellers: why outreach fails before the first call, how to tier your accounts, and one thing to do today."
   footerSignup={false}
+  overlayHeader
 >
-  <Section tone="cream" labelledby="guide-title">
-    <div class="guide">
+  <PageHero id="guide-title" eyebrow="Free guide" class="guide-hero">
+    Why most AEs lose net-new logos, <em>and the system that fixes it</em>
+    <div slot="lead">
+      <PlaceholderNote text="[Guide title pending: headline may change with the guide decision]" />
+      <p>A free short guide from a former sales leader who built and coached new-logo teams.</p>
+    </div>
+    <div slot="actions" class="guide-form">
+      <SignupForm source="guide-page" />
+      <p class="fine-print">
+        One email now with your guide, then a short series on finding new deals. Unsubscribe anytime.
+      </p>
+    </div>
+    <div slot="aside" class="guide-media">
+      <BrandVideo {...videoProps("teaser")} aspect="4/5" maxWidth="400px" eager sizes="400px" />
+    </div>
+  </PageHero>
+
+  <Section tone="cream" labelledby="get-title">
+    <div class="get">
       <div>
-        <Eyebrow>Free guide</Eyebrow>
-        <h1 id="guide-title">Why most AEs lose net-new logos, and the system that fixes it</h1>
-        <PlaceholderNote text="[Guide title pending: headline may change with the guide decision]" />
-        <p class="lede">A free short guide from a former sales leader who built and coached new-logo teams.</p>
-        <ul class="check-list">
-          <li>Why outreach fails before the first call</li>
-          <li>How to tier your accounts so you chase the right ones</li>
-          <li>One thing to do today</li>
-        </ul>
-        <SignupForm source="guide-page" />
-        <p class="fine-print">
-          One email now with your guide, then a short series on finding new deals. Unsubscribe anytime.
-        </p>
+        <SectionHeader id="get-title" eyebrow="Inside the guide">
+          What you'll <em>get.</em>
+        </SectionHeader>
+        <ol class="points" role="list" data-reveal-group>
+          {
+            points.map((point, i) => (
+              <li data-reveal>
+                <span class="point-num" aria-hidden="true">
+                  0{i + 1}
+                </span>
+                <span class="point-icon">
+                  <Icon name={point.icon} size={22} />
+                </span>
+                <span class="point-text">{point.text}</span>
+              </li>
+            ))
+          }
+        </ol>
       </div>
-      <div class="media">
-        <BrandVideo {...videoProps("teaser")} aspect="4/5" maxWidth="420px" />
+      <div class="get-visual" data-reveal>
+        <GuideMockup />
       </div>
     </div>
   </Section>
 </BaseLayout>
 
 <style>
-  .guide {
-    display: grid;
-    gap: 3rem;
-    align-items: start;
+  .guide-hero :global(h1) {
+    font-size: clamp(2.5rem, 3.2vw + 1rem, 4.75rem);
+    max-width: 18ch;
   }
 
-  @media (min-width: 1024px) {
-    .guide {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
-      gap: 4rem;
-    }
-  }
-
-  @media (max-width: 1023px) {
-    .media {
-      display: grid;
-      justify-items: center;
-    }
-  }
-
-  h1 {
-    max-width: 20ch;
+  .guide-form {
+    width: 100%;
+    max-width: 560px;
   }
 
   .fine-print {
     margin-top: 1rem;
     font-size: var(--step--1);
+    color: var(--color-on-band);
+  }
+
+  .guide-media {
+    display: grid;
+    justify-items: center;
+  }
+
+  .get {
+    display: grid;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  @media (min-width: 900px) {
+    .get {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: clamp(3rem, 6vw, 6rem);
+    }
+  }
+
+  .points {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--hairline-light);
+  }
+
+  .points li {
+    display: grid;
+    grid-template-columns: 3rem 3rem minmax(0, 1fr);
+    gap: 1rem;
+    align-items: center;
+    padding: 1.6rem 0;
+    border-bottom: 1px solid var(--hairline-light);
+  }
+
+  .point-num {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--gold-800);
+  }
+
+  .point-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    border: 1px solid var(--hairline-gold);
+    color: var(--forest-900);
+  }
+
+  .point-text {
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 1.05rem + 0.8vw, 1.85rem);
+    line-height: 1.25;
+    color: var(--color-heading);
+  }
+
+  @media (max-width: 479px) {
+    .points li {
+      grid-template-columns: 2rem minmax(0, 1fr);
+    }
+
+    .point-icon {
+      display: none;
+    }
   }
 </style>

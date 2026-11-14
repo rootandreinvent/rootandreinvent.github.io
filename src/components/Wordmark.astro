@@ -3,8 +3,8 @@ import { Image } from "astro:assets";
 import mark from "../assets/logo-mark.png";
 
 interface Props {
-  /** Text color: "green" for cream backgrounds, "cream" for green bands. */
-  variant?: "green" | "cream";
+  /** Text color: "green" on light, "cream" on dark, "auto" inherits the current color. */
+  variant?: "green" | "cream" | "auto";
   size?: "md" | "lg";
   /** Hide the text below 400px, leaving only the round R&R mark. */
   compact?: boolean;
@@ -15,7 +15,7 @@ const markSize = size === "lg" ? 56 : 40;
 ---
 
 <span class:list={["wordmark", `wordmark-${variant}`, `wordmark-${size}`, { compact }]}>
-  <Image src={mark} alt="" width={markSize} height={markSize} class="mark" loading="eager" />
+  <Image src={mark} alt="" width={markSize} height={markSize} densities={[1, 2, 3]} class="mark" loading="eager" />
   <span class="text">Root <span class="amp">&amp;</span> Reinvent</span>
 </span>
 
@@ -23,7 +23,7 @@ const markSize = size === "lg" ? 56 : 40;
   .wordmark {
     display: inline-flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: 0.7rem;
     white-space: nowrap;
     line-height: 1;
   }
@@ -35,13 +35,20 @@ const markSize = size === "lg" ? 56 : 40;
 
   .text {
     font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.2em;
+  }
+
+  .amp {
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0;
+    margin-inline: 0.05em;
   }
 
   .wordmark-md .text {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   .wordmark-lg .text {
@@ -52,13 +59,20 @@ const markSize = size === "lg" ? 56 : 40;
     color: var(--color-heading);
   }
   .wordmark-green .amp {
-    color: var(--color-gold-ink);
+    color: var(--gold-800);
   }
   .wordmark-cream .text {
     color: var(--color-on-band-strong);
   }
-  .wordmark-cream .amp {
-    color: var(--color-gold);
+  .wordmark-cream .amp,
+  :global(.tone-dark) .wordmark-auto .amp {
+    color: var(--gold-500);
+  }
+  .wordmark-auto .text {
+    color: inherit;
+  }
+  .wordmark-auto .amp {
+    color: var(--gold-800);
   }
 
   @media (max-width: 399px) {

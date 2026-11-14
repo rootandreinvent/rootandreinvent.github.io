@@ -1,50 +1,57 @@
 ---
 interface Props {
-  tone?: "cream" | "band" | "bordered";
+  /** cream = bone-50, bone = bone-100, band = forest-900, deep = forest-950. */
+  tone?: "cream" | "bone" | "band" | "deep" | "bordered";
   id?: string;
   labelledby?: string;
   class?: string;
+  glow?: boolean;
+  wide?: boolean;
 }
 
-const { tone = "cream", id, labelledby, class: className } = Astro.props;
+const { tone = "cream", id, labelledby, class: className, glow = false, wide = false } = Astro.props;
+const dark = tone === "band" || tone === "deep";
 ---
 
 <section
   id={id}
   aria-labelledby={labelledby}
-  class:list={["section", `tone-${tone}`, className]}
+  class:list={["section", `tone-${tone}`, { "tone-dark": dark, grain: dark, glow }, className]}
 >
-  <div class="container">
+  <div class:list={["container", { wide }]}>
     <slot />
   </div>
 </section>
 
 <style>
   .section {
+    position: relative;
     padding-block: var(--space-section);
+    overflow-x: clip;
+  }
+
+  .wide {
+    max-width: calc(var(--max-wide) + var(--gutter) * 2);
   }
 
   .tone-cream {
     background: var(--color-bg);
   }
 
+  .tone-bone {
+    background: var(--color-bg-alt);
+  }
+
   .tone-bordered {
     background: var(--color-bg);
-    border-block: 1.5px solid var(--color-border);
+    border-block: 1px solid var(--hairline-light);
   }
 
   .tone-band {
     background: var(--color-band);
-    color: var(--color-on-band);
   }
 
-  .tone-band :global(h1),
-  .tone-band :global(h2),
-  .tone-band :global(h3) {
-    color: var(--color-on-band-strong);
-  }
-
-  .tone-band :global(a:not(.btn)) {
-    color: var(--color-on-band-strong);
+  .tone-deep {
+    background: var(--color-band-deep);
   }
 </style>

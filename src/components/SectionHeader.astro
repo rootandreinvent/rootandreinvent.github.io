@@ -1,0 +1,41 @@
+---
+import Eyebrow from "./Eyebrow.astro";
+
+interface Props {
+  eyebrow?: string;
+  id: string;
+  level?: "h1" | "h2";
+  class?: string;
+}
+
+const { eyebrow, id, level: Heading = "h2", class: className } = Astro.props;
+const hasLead = Astro.slots.has("lead");
+---
+
+<header class:list={["section-header", className]} data-reveal>
+  {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
+  <Heading id={id}><slot /></Heading>
+  {hasLead && <div class="lead"><slot name="lead" /></div>}
+</header>
+
+<style>
+  .section-header {
+    max-width: 52rem;
+    margin-bottom: clamp(2.5rem, 2rem + 2vw, 4rem);
+  }
+
+  .section-header :global(h1),
+  .section-header :global(h2) {
+    margin-bottom: 0;
+  }
+
+  .lead {
+    margin-top: 1.5rem;
+  }
+
+  .lead :global(p) {
+    font-size: var(--step-1);
+    line-height: 1.6;
+    margin: 0;
+  }
+</style>

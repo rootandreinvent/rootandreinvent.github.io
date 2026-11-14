@@ -1,8 +1,15 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import Section from "../components/Section.astro";
+import LegalPage from "../components/LegalPage.astro";
 import PlaceholderNote from "../components/PlaceholderNote.astro";
 import { site } from "../config/site";
+
+const toc = [
+  { id: "collects", label: "What this site collects" },
+  { id: "email", label: "Email" },
+  { id: "purchases", label: "Purchases" },
+  { id: "contact", label: "Contact" },
+];
 ---
 
 <BaseLayout
@@ -11,42 +18,28 @@ import { site } from "../config/site";
   noindex
   draftBanner="Draft. Needs Kelsey's review before launch."
 >
-  <Section tone="cream" labelledby="privacy-title">
-    <div class="legal">
-      <h1 id="privacy-title">Privacy</h1>
-      <PlaceholderNote text="[TODO: review with an attorney before launch; add effective date]" />
+  <LegalPage id="privacy-title" title="Privacy" toc={toc}>
+    <PlaceholderNote text="[TODO: review with an attorney before launch; add effective date]" />
 
-      <h2>What this site collects</h2>
-      <p>
-        This site doesn't set cookies or run advertising trackers. If you sign up for the free guide or a waitlist, you
-        give us your email address. It's stored by our email provider and used only to send what you asked for.
-      </p>
+    <h2 id="collects">What this site collects</h2>
+    <p>
+      This site doesn't set cookies or run advertising trackers. If you sign up for the free guide or a waitlist, you
+      give us your email address. It's stored by our email provider and used only to send what you asked for.
+    </p>
 
-      <h2>Email</h2>
-      <p>
-        Every email includes a working unsubscribe link. You can also reply or write to {site.email.contact} and we'll
-        remove you.
-      </p>
+    <h2 id="email">Email</h2>
+    <p>
+      Every email includes a working unsubscribe link. You can also reply or write to {site.email.contact} and we'll
+      remove you.
+    </p>
 
-      <h2>Purchases</h2>
-      <p>
-        When products go on sale, checkout is handled by a hosted checkout provider. This site never sees or stores your
-        card details.
-      </p>
+    <h2 id="purchases">Purchases</h2>
+    <p>
+      When products go on sale, checkout is handled by a hosted checkout provider. This site never sees or stores your
+      card details.
+    </p>
 
-      <h2>Contact</h2>
-      <p>Questions about your information: {site.email.contact}.</p>
-    </div>
-  </Section>
+    <h2 id="contact">Contact</h2>
+    <p>Questions about your information: {site.email.contact}.</p>
+  </LegalPage>
 </BaseLayout>
-
-<style>
-  .legal {
-    max-width: calc(var(--measure) + 2rem);
-  }
-
-  h2 {
-    font-size: var(--step-2);
-    margin-top: 2.25rem;
-  }
-</style>

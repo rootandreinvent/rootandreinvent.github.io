@@ -1,81 +1,60 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Section from "../../components/Section.astro";
+import SectionHeader from "../../components/SectionHeader.astro";
+import PageHero from "../../components/PageHero.astro";
 import Eyebrow from "../../components/Eyebrow.astro";
-import StepCard from "../../components/StepCard.astro";
+import MethodSteps from "../../components/MethodSteps.astro";
 import EmailAnatomy from "../../components/EmailAnatomy.astro";
-import SignupForm from "../../components/SignupForm.astro";
+import GuideBand from "../../components/GuideBand.astro";
 import BrandVideo from "../../components/BrandVideo.astro";
-import { getMethodPosts, methodPillars } from "../../lib/content";
+import { getMethodPosts } from "../../lib/content";
 import { videoLd } from "../../lib/jsonld";
 import { videoProps } from "../../lib/video";
 
-const published = new Set((await getMethodPosts()).map((p) => p.data.slug));
+const published = (await getMethodPosts()).map((p) => p.data.slug);
 ---
 
 <BaseLayout
   title="The Repeat Success Method"
   description="A repeatable way to land new logos in four parts: Prioritize, People, Proof and Persistence. Plus the three-part first email."
   footerSignup={false}
+  overlayHeader
   jsonLd={videoLd("walkthrough", Astro.site)}
 >
-  <Section tone="band" labelledby="method-title">
-    <Eyebrow>The method</Eyebrow>
-    <h1 id="method-title">The Repeat Success Method</h1>
-    <p class="lede">
+  <PageHero id="method-title" eyebrow="The method">
+    The Repeat Success <em>Method</em>
+    <p slot="lead">
       A repeatable way to land new logos: a short, researched, proof-based first email that earns a 15 to 20 minute
       meeting, and the work around it.
     </p>
-    <div class="walkthrough">
-      <BrandVideo {...videoProps("walkthrough")} maxWidth="880px" />
+    <div slot="aside" class="hero-video">
+      <BrandVideo {...videoProps("walkthrough")} eager sizes="(min-width: 1024px) 40vw, 100vw" />
     </div>
-    <div class="grid grid-4 cards">
-      {
-        methodPillars.map((p) => (
-          <StepCard
-            numeral={p.numeral}
-            title={p.title}
-            href={published.has(p.slug) ? `/method/${p.slug}/` : undefined}
-            linkLabel="Read more"
-          >
-            {p.body}
-          </StepCard>
-        ))
-      }
-    </div>
+  </PageHero>
+
+  <Section tone="deep" labelledby="steps-title">
+    <MethodSteps published={published}>
+      <div slot="header">
+        <Eyebrow>The four parts</Eyebrow>
+        <h2 id="steps-title">A <em>repeatable</em> way to land new logos.</h2>
+      </div>
+    </MethodSteps>
   </Section>
 
-  <Section tone="cream" labelledby="framework-title">
-    <Eyebrow>The Repeat Success Framework</Eyebrow>
-    <h2 id="framework-title">Every first email has three parts. Nothing else.</h2>
-    <p class="lede">
-      You are not asking them to buy. You are asking whether a conversation is worth their time, which is a much
-      smaller ask and easier to say yes to.
-    </p>
+  <Section tone="bone" labelledby="framework-title">
+    <SectionHeader id="framework-title" eyebrow="The Repeat Success Framework">
+      Every first email has three parts. <em>Nothing else.</em>
+      <p slot="lead">
+        You are not asking them to buy. You are asking whether a conversation is worth their time, which is a much
+        smaller ask and easier to say yes to.
+      </p>
+    </SectionHeader>
     <EmailAnatomy />
   </Section>
 
-  <Section tone="band" labelledby="signup-title">
-    <div class="signup">
-      <h2 id="signup-title">Get the free guide.</h2>
-      <p class="lede">A template and three AI prompts that get replies.</p>
-      <SignupForm source="method-overview" />
-    </div>
-  </Section>
+  <GuideBand source="method-overview" headingId="signup-title">
+    Get the <em>free guide.</em>
+    <p slot="lead">A template and three AI prompts that get replies.</p>
+  </GuideBand>
 </BaseLayout>
-
-<style>
-  .cards {
-    margin-top: 2.5rem;
-  }
-
-  .walkthrough {
-    display: grid;
-    justify-items: center;
-    margin-top: 2.5rem;
-  }
-
-  .signup {
-    max-width: 720px;
-  }
-</style>

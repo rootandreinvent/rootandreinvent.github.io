@@ -18,9 +18,21 @@ interface Props {
   sizes?: string;
   /** Above-the-fold poster: load eagerly with high priority. */
   eager?: boolean;
+  class?: string;
 }
 
-const { src, poster, captions, title, durationLabel, aspect = "16/9", maxWidth = "100%", sizes, eager = false } = Astro.props;
+const {
+  src,
+  poster,
+  captions,
+  title,
+  durationLabel,
+  aspect = "16/9",
+  maxWidth = "100%",
+  sizes,
+  eager = false,
+  class: className,
+} = Astro.props;
 
 const inPublic = (path?: string) => Boolean(path) && existsSync(join(process.cwd(), "public", path!));
 const ready = inPublic(src);
@@ -30,98 +42,64 @@ const [ratioW, ratioH] = aspect === "4/5" ? [4, 5] : [16, 9];
 const posterName = poster.split("/").pop();
 const posters = import.meta.glob<{ default: ImageMetadata }>("../assets/video/*.jpg", { eager: true });
 const posterAsset = Object.entries(posters).find(([path]) => path.endsWith(`/${posterName}`))?.[1].default;
-const posterSizes = sizes ?? (maxWidth.endsWith("px") ? `(min-width: ${maxWidth}) ${maxWidth}, 100vw` : "(min-width: 1120px) 1056px, 100vw");
+const posterSizes =
+  sizes ?? (maxWidth.endsWith("px") ? `(min-width: ${maxWidth}) ${maxWidth}, 100vw` : "(min-width: 1120px) 1056px, 100vw");
 const loading = eager ? "eager" : "lazy";
 ---
 
 <div
-  class:list={["brand-video", { "is-missing": !ready }]}
+  class:list={["brand-video", { "is-missing": !ready }, className]}
   style={`--video-max: ${maxWidth}; --video-ratio: ${ratioW} / ${ratioH};`}
   data-brand-video
-  data-src={ready ? url(src) : undefined}
-  data-poster={url(poster)}
-  data-captions={captionsHref}
-  data-title={title}
 >
   <div class="frame">
-    {
-      posterAsset ? (
-        <Image
-          src={posterAsset}
-          alt=""
-          class="poster"
-          widths={[480, 960, 1440, posterAsset.width].filter((w) => w <= posterAsset.width)}
-          sizes={posterSizes}
-          loading={loading}
-          fetchpriority={eager ? "high" : undefined}
-          decoding="async"
-        />
-      ) : (
-        inPublic(poster) && <img src={url(poster)} alt="" class="poster" loading={loading} decoding="async" />
-      )
-    }
+    <div class="poster-wrap" data-parallax="10">
+      {
+        posterAsset ? (
+          <Image
+            src={posterAsset}
+            alt=""
+            class="poster"
+            widths={[480, 960, 1440, posterAsset.width].filter((w) => w <= posterAsset.width)}
+            sizes={posterSizes}
+            loading={loading}
+            fetchpriority={eager ? "high" : undefined}
+            decoding="async"
+          />
+        ) : (
+          inPublic(poster) && <img src={url(poster)} alt="" class="poster" loading={loading} decoding="async" />
+        )
+      }
+    </div>
+    <span class="scrim" aria-hidden="true"></span>
     {
       ready && (
-        <a class="play" href={url(src)} data-play aria-label={`Play video: ${title} (${durationLabel})`}>
-          <span class="play-icon" aria-hidden="true" />
-          <span class="label" aria-hidden="true">Watch · {durationLabel}</span>
+        <a
+          class="play"
+          href={url(src)}
+          data-play
+          data-src={url(src)}
+          data-poster={url(poster)}
+          data-captions={captionsHref}
+          data-title={title}
+          data-aspect={aspect}
+          aria-label={`Watch · ${durationLabel}: ${title}`}
+        >
+          <span class="play-btn" aria-hidden="true">
+            <span class="play-ring" />
+            <svg viewBox="0 0 24 24" class="play-glyph">
+              <path d="M8 5.5v13l10.5-6.5z" />
+            </svg>
+          </span>
+          <span class="label" aria-hidden="true">
+            Watch <span class="dot">·</span> {durationLabel}
+          </span>
         </a>
       )
     }
-    <p class="soon">Video coming soon</p>
+    <p class="soon">Video available soon</p>
   </div>
 </div>
-
-<script>
-  document.querySelectorAll<HTMLElement>("[data-brand-video]").forEach((root) => {
-    const play = root.querySelector<HTMLAnchorElement>("[data-play]");
-    const frame = root.querySelector<HTMLElement>(".frame");
-    const { src, poster, captions, title } = root.dataset;
-    if (!play || !frame || !src) return;
-
-    // Without JS the link opens the MP4 in the browser's own player.
-    play.setAttribute("role", "button");
-
-    const start = (event: Event) => {
-      event.preventDefault();
-      const video = document.createElement("video");
-      video.src = src;
-      if (poster) video.poster = poster;
-      video.controls = true;
-      video.playsInline = true;
-      video.preload = "metadata";
-      video.autoplay = true;
-      video.setAttribute("aria-label", title ?? "");
-      if (captions) {
-        // Captions are burned in, so the track stays off by default.
-        const track = document.createElement("track");
-        track.kind = "captions";
-        track.src = captions;
-        track.srclang = "en";
-        track.label = "English";
-        video.append(track);
-      }
-      video.addEventListener(
-        "error",
-        () => {
-          video.remove();
-          root.classList.remove("is-playing");
-          root.classList.add("is-missing");
-        },
-        { once: true },
-      );
-      frame.append(video);
-      root.classList.add("is-playing");
-      video.play().catch(() => {});
-      video.focus();
-    };
-
-    play.addEventListener("click", start);
-    play.addEventListener("keydown", (event) => {
-      if (event.key === " ") start(event);
-    });
-  });
-</script>
 
 <style>
   .brand-video {
@@ -132,106 +110,152 @@ const loading = eager ? "eager" : "lazy";
   .frame {
     position: relative;
     aspect-ratio: var(--video-ratio);
-    border-radius: var(--radius-card);
+    border-radius: var(--radius-media);
     overflow: hidden;
-    background: var(--color-band);
-    border: 2px solid var(--color-border);
-    box-shadow: 0 18px 40px -24px rgb(23 52 46 / 0.55);
+    background: var(--forest-900);
+    border: 1px solid color-mix(in srgb, var(--sage-200) 70%, transparent);
+    box-shadow: var(--shadow-lg);
+    isolation: isolate;
   }
 
-  :global(.tone-band) .frame {
-    border: 0;
-    box-shadow: 0 18px 44px -22px rgb(0 0 0 / 0.6);
+  :global(.tone-dark) .frame {
+    border-color: var(--hairline-gold);
+    box-shadow:
+      0 40px 80px -40px rgb(0 0 0 / 0.65),
+      0 0 0 1px color-mix(in srgb, var(--gold-500) 8%, transparent);
   }
 
-  .frame :global(.poster),
-  .frame :global(video) {
+  .poster-wrap {
     position: absolute;
-    inset: 0;
+    inset: -6% 0;
+  }
+
+  .poster-wrap :global(.poster) {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 1.2s var(--ease-out);
   }
 
-  .frame :global(video) {
-    object-fit: contain;
-    background: var(--color-band);
+  .scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--forest-950) 0%, transparent) 50%,
+      color-mix(in srgb, var(--forest-950) 88%, transparent) 100%
+    );
+    pointer-events: none;
   }
 
   .play {
     position: absolute;
     inset: 0;
-    display: grid;
-    place-items: center;
-    color: var(--color-on-band-strong);
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    gap: 1rem;
+    padding: clamp(0.9rem, 2.4vw, 1.6rem);
+    color: var(--bone-50);
     text-decoration: none;
-    background: rgb(23 52 46 / 0.12);
+    border-radius: inherit;
   }
 
   .play:focus-visible {
-    outline: 3px solid var(--color-gold);
-    outline-offset: -6px;
-    border-radius: var(--radius-card);
+    outline: 2px solid var(--gold-500);
+    outline-offset: -8px;
+    border-radius: var(--radius-media);
   }
 
-  .play-icon {
-    width: clamp(72px, 9vw, 88px);
+  .play-btn {
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: clamp(52px, 5.5vw, 72px);
     aspect-ratio: 1;
     border-radius: 999px;
-    background: var(--color-gold);
-    position: relative;
-    box-shadow: 0 8px 24px -8px rgb(0 0 0 / 0.5);
-    transition: transform 0.15s ease, background-color 0.15s ease;
+    background: var(--gold-500);
+    color: var(--forest-950);
+    box-shadow: 0 14px 34px -10px rgb(0 0 0 / 0.55);
+    transition:
+      transform 0.4s var(--ease-out),
+      background-color 0.25s ease;
   }
 
-  .play-icon::after {
-    content: "";
+  .play-ring {
     position: absolute;
-    left: 54%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    border-style: solid;
-    border-width: 0.8rem 0 0.8rem 1.3rem;
-    border-color: transparent transparent transparent var(--color-band);
+    inset: -10px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--gold-500) 80%, transparent);
+    animation: pulse 2.8s var(--ease-out) infinite;
   }
 
-  .play:hover .play-icon,
-  .play:focus-visible .play-icon {
-    background: var(--color-gold-hover);
-    transform: scale(1.05);
+  @keyframes pulse {
+    0% {
+      transform: scale(0.92);
+      opacity: 0.9;
+    }
+    80%,
+    100% {
+      transform: scale(1.35);
+      opacity: 0;
+    }
+  }
+
+  .play-glyph {
+    width: 38%;
+    height: auto;
+    margin-left: 8%;
+    fill: currentColor;
+  }
+
+  .play:hover .play-btn,
+  .play:focus-visible .play-btn {
+    transform: scale(1.06);
+    background: var(--gold-600);
+  }
+
+  .play:hover :global(.poster) {
+    transform: scale(1.03);
   }
 
   .label {
-    position: absolute;
-    left: 0.75rem;
-    bottom: 0.75rem;
-    padding: 0.3rem 0.7rem;
-    border-radius: 999px;
-    background: rgb(23 52 46 / 0.9);
+    margin-bottom: clamp(0.6rem, 1.2vw, 1rem);
+    padding: 0.4rem 0.85rem;
+    border-radius: var(--radius-button);
+    background: color-mix(in srgb, var(--forest-950) 82%, transparent);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
     font-family: var(--font-ui);
     font-weight: 600;
-    font-size: 0.875rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
     line-height: 1.3;
-    color: var(--color-on-band-strong);
+    color: var(--bone-50);
+  }
+
+  .dot {
+    color: var(--gold-500);
   }
 
   .soon {
     display: none;
     position: absolute;
-    inset: auto 0 0;
+    left: 50%;
+    bottom: 1.25rem;
+    transform: translateX(-50%);
     margin: 0;
-    max-width: none;
-    padding: 0.75rem 1rem;
+    padding: 0.45rem 1rem;
+    border-radius: var(--radius-button);
     font-family: var(--font-ui);
+    font-size: 0.85rem;
     font-weight: 600;
-    text-align: center;
-    color: var(--color-on-band-strong);
-    background: rgb(23 52 46 / 0.85);
-  }
-
-  .is-playing .play,
-  .is-playing :global(.poster) {
-    display: none;
+    white-space: nowrap;
+    color: var(--bone-50);
+    background: color-mix(in srgb, var(--forest-950) 85%, transparent);
+    border: 1px solid var(--hairline-gold);
   }
 
   .is-missing .play {
@@ -243,8 +267,9 @@ const loading = eager ? "eager" : "lazy";
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .play-icon {
-      transition: none;
+    .play-ring {
+      animation: none;
+      opacity: 0.6;
     }
   }
 </style>

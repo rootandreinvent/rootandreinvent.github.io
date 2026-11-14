@@ -1,0 +1,60 @@
+---
+import Section from "./Section.astro";
+import SectionHeader from "./SectionHeader.astro";
+import SignupForm from "./SignupForm.astro";
+import GuideMockup from "./GuideMockup.astro";
+
+interface Props {
+  /** Signup source sent to Kit, e.g. "home-footer". */
+  source: string;
+  id?: string;
+  headingId?: string;
+  eyebrow?: string;
+}
+
+const { source, id, headingId = "guide-title", eyebrow = "Free guide" } = Astro.props;
+---
+
+<Section tone="deep" labelledby={headingId} id={id} glow>
+  <div class="guide-band">
+    <div class="guide-copy">
+      <SectionHeader id={headingId} eyebrow={eyebrow}>
+        <slot />
+      </SectionHeader>
+      <div class="guide-lead"><slot name="lead" /></div>
+      <SignupForm source={source} />
+    </div>
+    <div class="guide-visual" data-reveal>
+      <GuideMockup />
+    </div>
+  </div>
+</Section>
+
+<style>
+  .guide-band {
+    display: grid;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  @media (min-width: 900px) {
+    .guide-band {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: clamp(3rem, 6vw, 6rem);
+    }
+  }
+
+  .guide-copy :global(.section-header) {
+    margin-bottom: 1.5rem;
+  }
+
+  .guide-lead :global(p) {
+    font-size: var(--step-1);
+    line-height: 1.6;
+    color: var(--color-on-band);
+  }
+
+  .guide-copy :global(form) {
+    margin-top: 2rem;
+  }
+</style>

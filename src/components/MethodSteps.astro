@@ -1,0 +1,319 @@
+---
+import Icon, { type IconName } from "./Icon.astro";
+import RootLines from "./RootLines.astro";
+import { methodPillars } from "../lib/content";
+import { url } from "../lib/url";
+
+interface Props {
+  /** Slugs of method posts that are live, so their step can link to them. */
+  published?: string[];
+}
+
+const { published = [] } = Astro.props;
+const icons: Record<string, IconName> = {
+  prioritize: "target",
+  people: "user-focus",
+  proof: "file-check",
+  persistence: "repeat",
+};
+---
+
+<div class="method-steps" data-method-steps>
+  <div class="aside">
+    <div class="aside-inner">
+      <slot name="header" />
+      <ol class="progress" role="list" aria-hidden="true">
+        {
+          methodPillars.map((p, i) => (
+            <li class:list={["progress-item", { "is-active": i === 0 }]} data-progress={i}>
+              <span class="progress-num">0{p.numeral}</span>
+              <span class="progress-name">{p.title}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+
+  <div class="panels" data-spine-track>
+    <div class="spine" aria-hidden="true">
+      <RootLines variant="spine" tone="gold" />
+    </div>
+    <ol class="panel-list" role="list">
+      {
+        methodPillars.map((p, i) => (
+          <li class="panel" data-step={i}>
+            <span class="numeral" aria-hidden="true">
+              0{p.numeral}
+            </span>
+            <span class="node" aria-hidden="true" />
+            <div class="panel-body" data-reveal>
+              <span class="icon-wrap">
+                <Icon name={icons[p.slug]} size={28} />
+              </span>
+              <h3>
+                <span class="visually-hidden">Step {p.numeral}: </span>
+                {published.includes(p.slug) ? <a href={url(`/method/${p.slug}/`)}>{p.title}</a> : p.title}
+              </h3>
+              <p>{p.body}</p>
+              {published.includes(p.slug) && (
+                <a class="more" href={url(`/method/${p.slug}/`)} tabindex="-1" aria-hidden="true">
+                  Read more <Icon name="arrow" size={16} />
+                </a>
+              )}
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-method-steps]").forEach((root) => {
+    const panels = [...root.querySelectorAll<HTMLElement>("[data-step]")];
+    const items = [...root.querySelectorAll<HTMLElement>("[data-progress]")];
+    if (!("IntersectionObserver" in window)) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const index = Number((entry.target as HTMLElement).dataset.step);
+          panels.forEach((p, i) => p.classList.toggle("is-active", i === index));
+          items.forEach((item, i) => {
+            item.classList.toggle("is-active", i === index);
+            item.classList.toggle("is-done", i < index);
+          });
+        });
+      },
+      { rootMargin: "-45% 0px -45% 0px" },
+    );
+    panels.forEach((p) => observer.observe(p));
+  });
+</script>
+
+<style>
+  .method-steps {
+    display: grid;
+    gap: 3rem;
+  }
+
+  @media (min-width: 1024px) {
+    .method-steps {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: clamp(3rem, 6vw, 6rem);
+    }
+  }
+
+  .aside-inner :global(h2) {
+    max-width: 12ch;
+  }
+
+  .progress {
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .aside-inner {
+      position: sticky;
+      top: calc(var(--header-h) + 3rem);
+    }
+
+    .progress {
+      display: grid;
+      gap: 0;
+      list-style: none;
+      margin: 3rem 0 0;
+      padding: 0;
+      border-left: 1px solid var(--hairline-dark);
+    }
+  }
+
+  .progress-item {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.85rem 0 0.85rem 1.5rem;
+    font-family: var(--font-ui);
+    color: color-mix(in srgb, var(--bone-50) 55%, transparent);
+    transition: color 0.4s ease;
+  }
+
+  .progress-item::before {
+    content: "";
+    position: absolute;
+    left: -1px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--gold-500);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.5s var(--ease-out);
+  }
+
+  .progress-item.is-active,
+  .progress-item.is-done {
+    color: var(--bone-50);
+  }
+
+  .progress-item.is-active::before {
+    transform: scaleY(1);
+  }
+
+  .progress-num {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    color: var(--gold-500);
+  }
+
+  .progress-name {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+  }
+
+  .progress-item.is-active .progress-name {
+    font-style: italic;
+  }
+
+  /* Panels and the growing root connector. */
+  .panels {
+    position: relative;
+    padding-left: 3rem;
+  }
+
+  .spine {
+    position: absolute;
+    left: 0;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    width: 28px;
+  }
+
+  .panel-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 3rem;
+  }
+
+  .panel {
+    position: relative;
+  }
+
+  @media (min-width: 1024px) {
+    .panels {
+      padding-left: 4.5rem;
+    }
+
+    .panel-list {
+      gap: 0;
+    }
+
+    .panel {
+      min-height: 72vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-block: 3rem;
+    }
+  }
+
+  .node {
+    position: absolute;
+    left: calc(-3rem + 14px - 6px);
+    top: 0.6rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: var(--forest-950);
+    border: 1.5px solid var(--gold-500);
+    transition:
+      background-color 0.4s ease,
+      box-shadow 0.4s ease;
+  }
+
+  @media (min-width: 1024px) {
+    .node {
+      left: calc(-4.5rem + 14px - 6px);
+      top: 50%;
+    }
+  }
+
+  .panel.is-active .node {
+    background: var(--gold-500);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--gold-500) 18%, transparent);
+  }
+
+  .numeral {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(4.5rem, 10vw, 9rem);
+    line-height: 0.85;
+    letter-spacing: -0.04em;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--gold-500);
+    margin-bottom: 1rem;
+    opacity: 0.55;
+    transition: opacity 0.5s ease;
+  }
+
+  .panel.is-active .numeral {
+    opacity: 1;
+  }
+
+  .icon-wrap {
+    display: inline-grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 999px;
+    border: 1px solid var(--hairline-gold);
+    color: var(--gold-500);
+    margin-bottom: 1.25rem;
+  }
+
+  h3 {
+    font-size: clamp(2rem, 1.5rem + 1.5vw, 2.75rem);
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+  }
+
+  h3 a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  h3 a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+  }
+
+  .panel-body p {
+    font-size: var(--step-1);
+    color: var(--color-on-band);
+    max-width: 34ch;
+  }
+
+  .more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    color: var(--gold-500) !important;
+    text-decoration: none;
+  }
+
+  .more :global(.icon) {
+    transition: transform 0.3s var(--ease-out);
+  }
+
+  .more:hover :global(.icon) {
+    transform: translateX(4px);
+  }
+</style>

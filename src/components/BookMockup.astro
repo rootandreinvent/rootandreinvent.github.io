@@ -1,0 +1,202 @@
+---
+import { isPlaceholder } from "../lib/placeholders";
+
+interface Props {
+  title: string;
+  subtitle?: string;
+  /** Cover width on large screens. */
+  width?: string;
+  class?: string;
+}
+
+const { title, subtitle, width = "320px", class: className } = Astro.props;
+const displayTitle = isPlaceholder(title) ? "Coming soon" : title;
+const showSubtitle = subtitle && !isPlaceholder(subtitle);
+---
+
+<div class:list={["book-scene", className]} style={`--book-w: ${width}`} data-tilt>
+  <div class="book" role="img" aria-label={`${displayTitle} book cover`}>
+    <div class="face cover">
+      <span class="hinge" aria-hidden="true"></span>
+      <span class="brand">Root <span class="amp">&amp;</span> Reinvent</span>
+      <svg class="cover-lines" viewBox="0 0 200 160" aria-hidden="true">
+        <path d="M-10 150C40 130 70 112 100 92S150 50 210 30" />
+        <path d="M100 92C108 70 124 58 150 52" />
+        <path d="M60 122C70 106 86 100 104 102" />
+        <circle cx="100" cy="92" r="2.2" />
+        <circle cx="150" cy="52" r="2.2" />
+      </svg>
+      <span class="title">{displayTitle}</span>
+      {showSubtitle && <span class="subtitle">{subtitle}</span>}
+    </div>
+    <div class="face pages" aria-hidden="true"></div>
+    <div class="face back" aria-hidden="true"></div>
+  </div>
+  <div class="table-shadow" aria-hidden="true"></div>
+</div>
+
+<script>
+  const fine = matchMedia("(pointer: fine) and (prefers-reduced-motion: no-preference)").matches;
+  if (fine) {
+    document.querySelectorAll<HTMLElement>("[data-tilt]").forEach((scene) => {
+      scene.addEventListener("pointermove", (event) => {
+        const rect = scene.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / rect.width - 0.5;
+        const y = (event.clientY - rect.top) / rect.height - 0.5;
+        scene.style.setProperty("--ry", `${(x * 14).toFixed(2)}deg`);
+        scene.style.setProperty("--rx", `${(-y * 10).toFixed(2)}deg`);
+      });
+      scene.addEventListener("pointerleave", () => {
+        scene.style.removeProperty("--ry");
+        scene.style.removeProperty("--rx");
+      });
+    });
+  }
+</script>
+
+<style>
+  .book-scene {
+    --depth: 34px;
+    container-type: inline-size;
+    position: relative;
+    width: min(calc(100% - 3rem), var(--book-w));
+    margin-inline: auto;
+    perspective: 1600px;
+    padding-bottom: 2.5rem;
+  }
+
+  .book {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    transform-style: preserve-3d;
+    transform: rotateY(calc(-22deg + var(--ry, 0deg))) rotateX(calc(5deg + var(--rx, 0deg)));
+    transition: transform 0.8s var(--ease-out);
+  }
+
+  .face {
+    position: absolute;
+  }
+
+  .cover {
+    inset: 0;
+    transform: translateZ(calc(var(--depth) / 2));
+    display: flex;
+    flex-direction: column;
+    padding: 12% 11% 11% 15%;
+    border-radius: 3px 10px 10px 3px;
+    overflow: hidden;
+    color: var(--bone-50);
+    background:
+      radial-gradient(80% 60% at 85% 10%, color-mix(in srgb, var(--gold-500) 16%, transparent), transparent 70%),
+      linear-gradient(160deg, var(--forest-800), var(--forest-900) 45%, var(--forest-950));
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--gold-500) 18%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--bone-50) 12%, transparent);
+  }
+
+  .hinge {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 9%;
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--forest-950) 70%, transparent),
+      color-mix(in srgb, var(--bone-50) 8%, transparent) 55%,
+      color-mix(in srgb, var(--forest-950) 40%, transparent)
+    );
+  }
+
+  .brand {
+    font-family: var(--font-display);
+    font-size: 3.4cqi;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold-500);
+  }
+
+  .amp {
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .cover-lines {
+    width: 100%;
+    margin: auto 0 1rem;
+    height: auto;
+    fill: none;
+    stroke: color-mix(in srgb, var(--gold-500) 40%, transparent);
+    stroke-width: 1;
+  }
+
+  .cover-lines circle {
+    fill: color-mix(in srgb, var(--gold-500) 60%, transparent);
+    stroke: none;
+  }
+
+  .title {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 10.5cqi;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    background: linear-gradient(
+      105deg,
+      var(--gold-600) 0%,
+      color-mix(in srgb, var(--gold-500) 55%, var(--bone-50)) 38%,
+      var(--gold-500) 55%,
+      var(--gold-700) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .subtitle {
+    margin-top: 0.6rem;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 4.6cqi;
+    color: color-mix(in srgb, var(--bone-50) 80%, transparent);
+  }
+
+  .pages {
+    top: 1.2%;
+    bottom: 1.2%;
+    left: calc(100% - var(--depth) / 2 - 2px);
+    width: var(--depth);
+    transform: rotateY(90deg);
+    background: repeating-linear-gradient(
+      90deg,
+      var(--paper) 0 2px,
+      color-mix(in srgb, var(--color-border) 80%, var(--paper)) 2px 3px
+    );
+    box-shadow: inset 0 0 12px rgb(12 31 27 / 0.12);
+  }
+
+  .back {
+    inset: 0;
+    transform: translateZ(calc(var(--depth) / -2));
+    background: var(--forest-950);
+    border-radius: 3px 10px 10px 3px;
+  }
+
+  .table-shadow {
+    position: absolute;
+    left: 6%;
+    right: -6%;
+    bottom: 0.75rem;
+    height: 2.5rem;
+    background: radial-gradient(closest-side, rgb(12 31 27 / 0.35), transparent);
+    filter: blur(6px);
+    z-index: -1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .book {
+      transition: none;
+    }
+  }
+</style>

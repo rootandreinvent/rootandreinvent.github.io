@@ -2,60 +2,111 @@
 import { stats } from "../data/stats";
 import { showPending } from "../lib/placeholders";
 import PlaceholderNote from "./PlaceholderNote.astro";
+import Icon from "./Icon.astro";
 
 interface Props {
   featuredOnly?: boolean;
+  /** band: one row of four; grid: editorial 4 x 2. */
+  layout?: "band" | "grid";
 }
 
-const { featuredOnly = false } = Astro.props;
+const { featuredOnly = false, layout = "band" } = Astro.props;
 const visible = stats.filter((s) => (s.approved || showPending) && (!featuredOnly || s.featured));
+
+const parse = (value: string) => {
+  const match = value.match(/^(\d+)([+%]?)$/);
+  if (match) return { kind: "count" as const, to: Number(match[1]), suffix: match[2] };
+  if (/^\d/.test(value)) return { kind: "plain" as const };
+  return { kind: "award" as const };
+};
 ---
 
-<ul class="stats" role="list">
+<ul class:list={["stats", `stats-${layout}`]} role="list" data-reveal-group>
   {
-    visible.map((stat) => (
-      <li class:list={["stat", { pending: !stat.approved }]}>
-        <span class:list={["value", { long: stat.value.length > 4 }]}>{stat.value}</span>
-        {stat.label && <span class="label">{stat.label}</span>}
-        {!stat.approved && <PlaceholderNote text="[KELSEY TO CONFIRM]" />}
-      </li>
-    ))
+    visible.map((stat) => {
+      const kind = parse(stat.value);
+      return (
+        <li class:list={["stat", `stat-${kind.kind}`, { pending: !stat.approved }]} data-reveal>
+          {kind.kind === "award" ? (
+            <span class="value award">
+              <Icon name="laurel" size={44} strokeWidth={1.2} class="laurel" />
+              <span class="award-text">{stat.value}</span>
+            </span>
+          ) : kind.kind === "count" ? (
+            <span class="value">
+              <span aria-hidden="true" data-count={kind.to} data-suffix={kind.suffix}>
+                {stat.value}
+              </span>
+              <span class="visually-hidden">{stat.value}</span>
+            </span>
+          ) : (
+            <span class="value">{stat.value}</span>
+          )}
+          {stat.label && <span class="label">{stat.label}</span>}
+          {!stat.approved && <PlaceholderNote text="[KELSEY TO CONFIRM]" />}
+        </li>
+      );
+    })
   }
 </ul>
 
 <style>
   .stats {
     list-style: none;
-    margin: 2.5rem 0 0;
+    margin: 3rem 0 0;
     padding: 0;
     display: grid;
-    gap: 1.25rem;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid var(--hairline-light);
   }
 
-  @media (max-width: 639px) {
+  :global(.tone-dark) .stats {
+    border-top-color: var(--hairline-dark);
+  }
+
+  @media (min-width: 1024px) {
     .stats {
-      gap: 0.75rem;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .stat {
-      padding: 1.1rem;
-    }
-
-    .label {
-      font-size: 0.9rem;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
 
   .stat {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
-    padding: 1.5rem;
-    border-radius: var(--radius-card);
-    background: var(--color-band-raised);
-    border: 1.5px solid var(--color-band-border);
+    gap: 0.75rem;
+    padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 2vw, 2rem);
+    border-bottom: 1px solid var(--hairline-light);
+  }
+
+  :global(.tone-dark) .stat {
+    border-bottom-color: var(--hairline-dark);
+  }
+
+  .stat:nth-child(odd) {
+    padding-left: 0;
+  }
+
+  .stat:nth-child(even) {
+    border-left: 1px solid var(--hairline-light);
+  }
+
+  :global(.tone-dark) .stat:nth-child(even),
+  :global(.tone-dark) .stat:not(:nth-child(4n + 1)) {
+    border-left-color: var(--hairline-dark);
+  }
+
+  @media (min-width: 1024px) {
+    .stat:nth-child(odd) {
+      padding-left: clamp(1rem, 2vw, 2rem);
+    }
+
+    .stat:nth-child(4n + 1) {
+      padding-left: 0;
+    }
+
+    .stat:not(:nth-child(4n + 1)) {
+      border-left: 1px solid var(--hairline-light);
+    }
   }
 
   .stat.pending {
@@ -64,19 +115,65 @@ const visible = stats.filter((s) => (s.approved || showPending) && (!featuredOnl
 
   .value {
     font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(2.5rem, 2rem + 2vw, 3.5rem);
-    line-height: 1;
-    color: var(--color-gold);
+    font-weight: 400;
+    font-size: clamp(3.25rem, 2rem + 4vw, 6rem);
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+    font-variant-numeric: lining-nums tabular-nums;
+    color: var(--gold-700);
   }
 
-  .value.long {
-    font-size: clamp(1.5rem, 1.3rem + 0.8vw, 1.9rem);
-    line-height: 1.15;
+  .stats-grid .value {
+    font-size: clamp(2.75rem, 1.8rem + 3vw, 4.5rem);
+  }
+
+  :global(.tone-dark) .value {
+    color: var(--gold-500);
+  }
+
+  .award {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.4rem);
+    font-style: italic;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+  }
+
+  .stats-grid .award {
+    font-size: clamp(1.4rem, 1.1rem + 1vw, 2rem);
+  }
+
+  .award :global(.laurel) {
+    flex: none;
+    width: 1.6em;
+    height: auto;
+  }
+
+  .award-text {
+    max-width: 9ch;
   }
 
   .label {
-    color: var(--color-on-band);
     font-size: 1rem;
+    line-height: 1.45;
+    max-width: 24ch;
+    color: var(--color-body);
+  }
+
+  :global(.tone-dark) .label {
+    color: color-mix(in srgb, var(--bone-50) 76%, transparent);
+  }
+
+  @media (max-width: 639px) {
+    .label {
+      font-size: 0.92rem;
+    }
+
+    .award {
+      flex-direction: column;
+      align-items: flex-start;
+    }
   }
 </style>

@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import Section from "../../components/Section.astro";
+import PageHero from "../../components/PageHero.astro";
 import Button from "../../components/Button.astro";
 import { getMethodPosts } from "../../lib/content";
 import { url } from "../../lib/url";
@@ -13,29 +13,20 @@ const prioritize = (await getMethodPosts()).find((p) => p.data.slug === "priorit
   description="Confirm your email to get the free guide."
   noindex
   footerSignup={false}
+  overlayHeader
 >
-  <Section tone="cream" labelledby="thanks-title">
-    <div class="thanks">
-      <h1 id="thanks-title">Check your inbox to confirm.</h1>
-      <p class="lede">Your guide is on the way.</p>
+  <PageHero id="thanks-title" eyebrow="Free guide">
+    Check your inbox <em>to confirm.</em>
+    <div slot="lead">
+      <p>Your guide is on the way.</p>
       {
-        prioritize ? (
+        prioritize && (
           <p>
             While you wait, read: <a href={url("/method/prioritize/")}>Prioritize: who to call first</a>.
           </p>
-        ) : (
-          <div class="button-row">
-            <Button href="/method/" variant="secondary">Read about the method</Button>
-          </div>
         )
       }
     </div>
-  </Section>
+    {!prioritize && <Button slot="actions" href="/method/" variant="secondary">Read about the method</Button>}
+  </PageHero>
 </BaseLayout>
-
-<style>
-  .thanks {
-    max-width: 720px;
-    padding-block: 2rem;
-  }
-</style>

@@ -1,51 +1,111 @@
+/* Size-matched local fallbacks so the web fonts swap in without layout shift. */
+@font-face {
+  font-family: "Playfair Fallback";
+  src: local("Georgia"), local("Times New Roman");
+  size-adjust: 104%;
+  ascent-override: 104%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Inter Tight Fallback";
+  src: local("Arial"), local("Helvetica");
+  size-adjust: 95%;
+  ascent-override: 102%;
+  descent-override: 25%;
+  line-gap-override: 0%;
+}
+
 :root {
-  /* surfaces */
-  --color-bg:          #F6F1E7;  /* cream, main background */
-  --color-surface:     #FFFDF8;  /* warm white, cards */
-  --color-band:        #17342E;  /* deep green, hero/feature bands, footer */
-  --color-band-raised: #1F463E;  /* mid green, cards on dark bands */
-  --color-border:      #E2DACA;  /* sand rules and card borders */
-  --color-band-border: #2F5A50;  /* card borders on dark bands */
+  /* palette */
+  --forest-950: #0C1F1B;  /* deepest bands, footer */
+  --forest-900: #17342E;  /* brand green */
+  --forest-800: #1F463E;  /* raised surfaces on dark */
+  --forest-700: #24503F;  /* hover, secondary dark surfaces */
+  --moss-500:   #5E8A70;  /* icons, decorative accents (not for text) */
+  --sage-200:   #CFDCCD;  /* soft fills, text and hairlines on dark */
+  --bone-50:    #FAF7F0;  /* main light background */
+  --bone-100:   #F2ECDF;  /* alternate light sections */
+  --paper:      #FFFCF6;  /* cards on light */
+  --ink-900:    #14201D;  /* strong text on light */
+  --ink-600:    #4A5853;  /* body text on light */
+  --gold-500:   #E3A92B;  /* Kelsey's brand gold: accents, CTAs and text on dark */
+  --gold-600:   #D59C1F;  /* gold hover */
+  --gold-700:   #A0700F;  /* display-size gold on light (3:1+ large text only) */
+  --gold-800:   #8A5A00;  /* small gold text on light (AA) */
+  --clay-500:   #C0643E;  /* sparing tertiary accent (not for small text) */
+  --clay-700:   #9A4A2A;  /* clay text on light (AA) */
 
-  /* text */
-  --color-heading:     #17342E;
-  --color-body:        #3F514B;
-  --color-muted:       #6B7A74;  /* decorative only: below AA for small text on cream */
-  --color-on-band:     #CFE0D6;  /* body text on green */
-  --color-on-band-strong: #F6F1E7;
+  /* semantic: surfaces */
+  --color-bg:          var(--bone-50);
+  --color-bg-alt:      var(--bone-100);
+  --color-surface:     var(--paper);
+  --color-band:        var(--forest-900);
+  --color-band-deep:   var(--forest-950);
+  --color-band-raised: var(--forest-800);
+  --color-border:      #E2DACA;  /* sand hairlines on light */
+  --color-band-border: #2F5A50;  /* hairlines on dark */
+  --hairline-light:    color-mix(in srgb, var(--forest-900) 14%, transparent);
+  --hairline-dark:     color-mix(in srgb, var(--sage-200) 18%, transparent);
+  --hairline-gold:     color-mix(in srgb, var(--gold-500) 40%, transparent);
 
-  /* accents */
-  --color-gold:        #E3A92B;  /* buttons, numerals, key accents */
-  --color-gold-hover:  #D59C1F;  /* gold darkened ~6% */
-  --color-gold-ink:    #8A5A00;  /* gold-family text on cream (AA contrast) */
-  --color-teal:        #2E6B5A;  /* eyebrow labels, links */
+  /* semantic: text */
+  --color-heading:        var(--forest-900);
+  --color-body:           var(--ink-600);
+  --color-strong:         var(--ink-900);
+  --color-muted:          #6B7A74;  /* decorative only: below AA for small text */
+  --color-on-band:        #C9D6CE;  /* body text on green */
+  --color-on-band-strong: var(--bone-50);
+
+  /* semantic: accents */
+  --color-gold:       var(--gold-500);
+  --color-gold-hover: var(--gold-600);
+  --color-gold-ink:   var(--gold-800);
+  --color-teal:       #2E6B5A;  /* links on light */
 
   /* email highlights (three-part framework) */
-  --hl-reason: #FBEBC2;
-  --hl-proof:  #D9ECE1;
-  --hl-ask:    #E4DDF0;
+  --hl-reason: color-mix(in srgb, var(--moss-500) 22%, var(--paper));
+  --hl-proof:  color-mix(in srgb, var(--gold-500) 24%, var(--paper));
+  --hl-ask:    color-mix(in srgb, var(--clay-500) 18%, var(--paper));
 
   /* development-only TODO chips */
   --color-todo-bg:  #FFE45C;
   --color-todo-ink: #3A2E00;
 
   /* type */
-  --font-display: "Source Serif 4", ui-serif, Georgia, "Times New Roman", serif;  /* headings, numerals, wordmark */
-  --font-body:    "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-ui:      var(--font-body);  /* buttons, labels, nav, eyebrows */
+  --font-display: "Playfair Display Variable", "Playfair Fallback", Georgia, serif;
+  --font-body:    "Inter Tight Variable", "Inter Tight Fallback", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-ui:      var(--font-body);
 
-  --step--1: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
-  --step-0:  clamp(1.0625rem, 1.04rem + 0.12vw, 1.125rem);
-  --step-1:  clamp(1.2rem, 1.12rem + 0.4vw, 1.4rem);
-  --step-2:  clamp(1.45rem, 1.3rem + 0.75vw, 1.9rem);
-  --step-3:  clamp(1.8rem, 1.55rem + 1.3vw, 2.6rem);
-  --step-4:  clamp(2.25rem, 1.85rem + 2vw, 3.5rem);
+  --step--1: 0.875rem;
+  --step-0:  1.0625rem;
+  --step-1:  1.25rem;
+  --step-2:  clamp(1.375rem, 1vw + 1rem, 1.75rem);
+  --step-3:  clamp(2.25rem, 3.5vw + 1rem, 4.25rem);
+  --step-4:  clamp(2.6rem, 5vw + 1rem, 5.5rem);
+  --step-display: clamp(3rem, 7vw + 1rem, 7.5rem);
 
   /* layout */
-  --max-width: 1120px;
-  --measure: 66ch;
-  --radius-card: 16px;
-  --radius-button: 10px;
-  --space-section: clamp(4rem, 3rem + 5vw, 7rem);
-  --gutter: clamp(1.25rem, 0.9rem + 1.8vw, 2rem);
+  --max-width: 1280px;
+  --max-wide: 1440px;
+  --measure: 62ch;
+  --gutter: clamp(1.25rem, 4vw, 3rem);
+  --space-section: clamp(5rem, 10vw, 10rem);
+  --header-h: 76px;
+
+  /* shape */
+  --radius-sm: 4px;
+  --radius-card: 14px;
+  --radius-media: 24px;
+  --radius-button: 999px;
+
+  /* depth: layered, green-tinted */
+  --shadow-sm: 0 1px 2px rgb(12 31 27 / 0.06), 0 2px 6px rgb(12 31 27 / 0.05);
+  --shadow-md: 0 2px 4px rgb(12 31 27 / 0.06), 0 10px 24px -6px rgb(12 31 27 / 0.12);
+  --shadow-lg: 0 4px 8px rgb(12 31 27 / 0.08), 0 24px 56px -12px rgb(12 31 27 / 0.28);
+
+  /* motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur: 0.7s;
 }

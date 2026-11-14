@@ -1,45 +1,90 @@
 ---
-import { Image } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import Swoosh from "../components/Swoosh.astro";
-import RuleLabel from "../components/RuleLabel.astro";
-import mark from "../assets/logo-mark.png";
 import Section from "../components/Section.astro";
+import SectionHeader from "../components/SectionHeader.astro";
 import Eyebrow from "../components/Eyebrow.astro";
 import Button from "../components/Button.astro";
 import BookCallButton from "../components/BookCallButton.astro";
-import StepCard from "../components/StepCard.astro";
+import BuyButton from "../components/BuyButton.astro";
+import MethodSteps from "../components/MethodSteps.astro";
 import StatPanel from "../components/StatPanel.astro";
 import EmailAnatomy from "../components/EmailAnatomy.astro";
 import ServiceCard from "../components/ServiceCard.astro";
-import ProductCard from "../components/ProductCard.astro";
-import SignupForm from "../components/SignupForm.astro";
+import BookMockup from "../components/BookMockup.astro";
+import GuideBand from "../components/GuideBand.astro";
+import StatusPill from "../components/StatusPill.astro";
 import BrandVideo from "../components/BrandVideo.astro";
 import HeroLoop from "../components/HeroLoop.astro";
+import RootLines from "../components/RootLines.astro";
+import Icon from "../components/Icon.astro";
+import Testimonials from "../components/Testimonials.astro";
 import PlaceholderNote from "../components/PlaceholderNote.astro";
-import { getServices, getProducts, getMethodPosts, methodPillars } from "../lib/content";
+import { getServices, getProducts, getMethodPosts } from "../lib/content";
 import { organizationLd, personLd, videoLd } from "../lib/jsonld";
 import { videoProps } from "../lib/video";
+import { stats } from "../data/stats";
 
 const services = await getServices();
 const products = await getProducts();
 const playbook = products.find((p) => p.slug === "repeat-success-playbook");
-const published = new Set((await getMethodPosts()).map((p) => p.data.slug));
+const published = (await getMethodPosts()).map((p) => p.data.slug);
+
+const headline = ["Closing", "deals", "takes", "finding", "deals."];
+const statLine = (value: string) => {
+  const stat = stats.find((s) => s.value === value);
+  return stat ? `${stat.value} ${stat.label}` : value;
+};
+const credibility = [statLine("10+"), "Manager of the Year", statLine("3")];
+
+const approach = [
+  {
+    icon: "search" as const,
+    title: "Make it relevant.",
+    body: "Show you did your homework: one specific reason you're writing to this person.",
+  },
+  {
+    icon: "award" as const,
+    title: "Show proof.",
+    body: "Prove you've helped a company like theirs: a similar customer, a real challenge and a measurable result.",
+  },
+  { icon: "clock" as const, title: "Ask for 15 to 20 minutes.", body: "A small next step, nothing bigger." },
+];
+
+const roles = ["Inside sales rep", "Regional Sales Director", "Regional Vice President", "Senior Director"];
+const titlesLine = "From inside sales rep to Regional Sales Director, Regional Vice President and Senior Director.";
 ---
 
 <BaseLayout
   description="New-logo sales consulting from Kelsey Dalton. A repeatable method for sales reps, managers and founders: researched outreach, real proof and a small ask."
   footerSignup={false}
+  overlayHeader
   jsonLd={[organizationLd(Astro.site), personLd(Astro.site), videoLd("main", Astro.site)]}
 >
-  <section class="hero tone-band" aria-labelledby="hero-title">
-    <HeroLoop />
+  <!-- Hero -->
+  <section class="hero tone-dark grain" aria-labelledby="hero-title">
+    <div class="hero-bg" aria-hidden="true">
+      <HeroLoop />
+      <span class="hero-glow"></span>
+      <div class="hero-roots">
+        <RootLines variant="hero" tone="gold" />
+      </div>
+    </div>
+
     <div class="container hero-grid">
       <div class="hero-copy">
         <Eyebrow>New-logo sales consulting</Eyebrow>
-        <h1 id="hero-title">Closing deals takes finding deals.</h1>
-        <Swoosh />
-        <p class="lede">
+        <h1 id="hero-title" class="display hero-title">
+          {
+            headline.map((word, i) => (
+              <>
+                <span class="w">
+                  <span style={`--w: ${i}`}>{word === "finding" ? <em>{word}</em> : word}</span>
+                </span>{" "}
+              </>
+            ))
+          }
+        </h1>
+        <p class="lede hero-lede">
           I help sales reps, managers and founders land new logos with a repeatable method: researched outreach, real
           proof and a small ask.
         </p>
@@ -47,224 +92,639 @@ const published = new Set((await getMethodPosts()).map((p) => p.data.slug));
           <BookCallButton />
           <Button href="/guide/" variant="secondary">Get the free guide</Button>
         </div>
+        <ul class="credibility" role="list">
+          {credibility.map((item) => <li>{item}</li>)}
+        </ul>
       </div>
       <div class="hero-media">
         <BrandVideo
           {...videoProps("main")}
           eager
-          sizes="(min-width: 1120px) 570px, (min-width: 1024px) 52vw, 100vw"
+          sizes="(min-width: 1280px) 520px, (min-width: 1024px) 40vw, 100vw"
         />
       </div>
     </div>
   </section>
 
-  <Section tone="cream" labelledby="problem-title">
-    <Eyebrow>The problem</Eyebrow>
-    <h2 id="problem-title">
-      Your cold emails aren't getting replies.
-      <span class="accent">Here's why.</span>
-    </h2>
-    <p class="lede">
-      You're talking about your product instead of your buyer. What gets a reply is a short note that does three
-      things.
-    </p>
-    <RuleLabel>The better approach</RuleLabel>
-    <div class="grid grid-3 cards" data-reveal>
-      <StepCard numeral="1" title="Make it relevant.">
-        Show you did your homework: one specific reason you're writing to this person.
-      </StepCard>
-      <StepCard numeral="2" title="Show proof.">
-        Prove you've helped a company like theirs: a similar customer, a real challenge and a measurable result.
-      </StepCard>
-      <StepCard numeral="3" title="Ask for 15 to 20 minutes.">A small next step, nothing bigger.</StepCard>
+  <!-- The problem -->
+  <Section tone="cream" labelledby="problem-title" class="problem">
+    <div class="problem-grid">
+      <div class="problem-copy">
+        <SectionHeader id="problem-title" eyebrow="The problem">
+          Your cold emails aren't getting replies. <em>Here's why.</em>
+          <p slot="lead">
+            You're talking about your product instead of your buyer. What gets a reply is a short note that does three
+            things.
+          </p>
+        </SectionHeader>
+      </div>
+      <div class="problem-visual">
+        <div class="typical" aria-hidden="true">
+          <span class="ignored">Ignored</span>
+          <span class="sk sk-head"></span>
+          <span class="sk w90"></span><span class="sk w80"></span><span class="sk w95"></span><span class="sk w60"></span>
+          <span class="sk w85"></span><span class="sk w70"></span>
+        </div>
+        <div class="approach">
+          <p class="approach-label">The better approach</p>
+          <ol class="approach-list" role="list" data-reveal-group>
+            {
+              approach.map((step, i) => (
+                <li class="approach-card" data-reveal>
+                  <span class="approach-num" aria-hidden="true">
+                    0{i + 1}
+                  </span>
+                  <div>
+                    <h3>
+                      <Icon name={step.icon} size={20} class="approach-icon" />
+                      {step.title}
+                    </h3>
+                    <p>{step.body}</p>
+                  </div>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+      </div>
     </div>
   </Section>
 
-  <Section tone="band" labelledby="method-title">
-    <Eyebrow>The Repeat Success Method</Eyebrow>
-    <h2 id="method-title">A repeatable way to land new logos.</h2>
-    <div class="grid grid-4 cards" data-reveal>
-      {
-        methodPillars.map((p) => (
-          <StepCard
-            numeral={p.numeral}
-            title={p.title}
-            href={published.has(p.slug) ? `/method/${p.slug}/` : undefined}
-            linkLabel="Read more"
-          >
-            {p.body}
-          </StepCard>
-        ))
-      }
-    </div>
-    <div class="walkthrough">
+  <!-- The Repeat Success Method -->
+  <Section tone="deep" labelledby="method-title" glow>
+    <MethodSteps published={published}>
+      <div slot="header">
+        <Eyebrow>The Repeat Success Method</Eyebrow>
+        <h2 id="method-title">A <em>repeatable</em> way to land new logos.</h2>
+      </div>
+    </MethodSteps>
+    <div class="walkthrough" data-reveal>
       <p class="walkthrough-label">Watch the walkthrough: 3 minutes</p>
-      <BrandVideo {...videoProps("walkthrough")} maxWidth="880px" />
+      <BrandVideo {...videoProps("walkthrough")} maxWidth="1100px" />
     </div>
   </Section>
 
-  <Section tone="cream" labelledby="email-title">
-    <Eyebrow>An invitation, not a pitch</Eyebrow>
-    <h2 id="email-title">Every first email has three parts. Nothing else.</h2>
+  <!-- Email anatomy -->
+  <Section tone="bone" labelledby="email-title">
+    <SectionHeader id="email-title" eyebrow="An invitation, not a pitch">
+      Every first email has three parts. <em>Nothing else.</em>
+    </SectionHeader>
     <EmailAnatomy />
   </Section>
 
-  <Section tone="band" labelledby="track-title">
-    <Eyebrow>Track record</Eyebrow>
-    <h2 id="track-title">10+ years of winning new logos and leading the teams that win them.</h2>
+  <!-- Track record -->
+  <Section tone="band" labelledby="track-title" glow>
+    <SectionHeader id="track-title" eyebrow="Track record">
+      10+ years of winning new logos and <em>leading the teams that win them.</em>
+    </SectionHeader>
     <StatPanel featuredOnly />
-    <p class="titles">
-      From inside sales rep to Regional Sales Director, Regional Vice President and Senior Director.
+    <div class="career-line" data-reveal>
+      <p class="visually-hidden">{titlesLine}</p>
+      <div class="career-track" aria-hidden="true">
+        <RootLines variant="divider" tone="gold" branches={false} />
+      </div>
+      <ol class="career-nodes" role="list" aria-hidden="true">
+        {
+          roles.map((role) => (
+            <li>
+              <span class="career-dot" />
+              {role}
+            </li>
+          ))
+        }
+      </ol>
       <PlaceholderNote text="[KELSEY TO CONFIRM titles and order]" />
-    </p>
-    <div class="button-row">
-      <Button href="/about/#record" variant="secondary">See the full track record</Button>
+    </div>
+    <div class="track-link">
+      <Button href="/about/#record" variant="link">See the full track record</Button>
     </div>
   </Section>
 
+  <!-- Work with me -->
   <Section tone="cream" labelledby="help-title">
-    <Eyebrow>Work with me</Eyebrow>
-    <h2 id="help-title">Three ways to work together.</h2>
-    <div class="grid grid-3 cards" data-reveal>
-      {services.map((service) => <ServiceCard service={service} />)}
+    <SectionHeader id="help-title" eyebrow="Work with me">
+      Three ways to <em>work together.</em>
+    </SectionHeader>
+    <div class="services" data-reveal-group>
+      {services.map((service, i) => <ServiceCard service={service} index={i} featured={service.slug === "workshops"} />)}
     </div>
   </Section>
 
+  <!-- The playbook -->
   {
     playbook && (
-      <Section tone="bordered" labelledby="playbook-title">
-        <div class="teaser">
-          <div>
-            <Eyebrow>The playbook</Eyebrow>
-            <h2 id="playbook-title">The Repeat Success Method, in one playbook.</h2>
-            <p>
+      <Section tone="bone" labelledby="playbook-title">
+        <div class="playbook">
+          <div class="playbook-visual" data-reveal>
+            <BookMockup title={playbook.title} subtitle={playbook.subtitle} width="340px" />
+          </div>
+          <div class="playbook-copy">
+            <SectionHeader id="playbook-title" eyebrow="The playbook">
+              The Repeat Success Method, <em>in one playbook.</em>
+            </SectionHeader>
+            <StatusPill />
+            <p class="playbook-summary">
               The full method: who to call, your library of proof, the outreach cadence, running the first meeting, and
               AI prompts for every step. Includes an editable account-scoring toolkit and a guide for managers.
             </p>
-          </div>
-          <div class="teaser-card">
-            <ProductCard product={playbook} />
+            <p class="inside-title">What's inside</p>
+            <ul class="check-list" role="list">
+              {[...playbook.sections, ...playbook.includes.slice(1)].map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+            <BuyButton product={playbook} />
           </div>
         </div>
       </Section>
     )
   }
 
-  <Section tone="band" labelledby="guide-title" id="free-guide">
-    <div class="guide">
-      <Image src={mark} alt="" width={88} height={88} class="guide-mark" />
-      <h2 id="guide-title">
-        Want the exact template?
-        <span class="accent">Get the free cold email guide.</span>
-      </h2>
-      <Swoosh class="guide-swoosh" />
-      <p class="lede">
-        A template and three AI prompts that get replies. From a former sales leader who built and coached new-logo
-        teams.
-        <PlaceholderNote text="[Guide title pending: Kelsey is choosing between the email template guide and the 4-tier account guide]" />
-      </p>
-      <SignupForm source="home-footer" />
-    </div>
-  </Section>
+  <Testimonials />
+
+  <!-- Free guide -->
+  <GuideBand source="home-footer" id="free-guide">
+    Want the exact template? <em>Get the free cold email guide.</em>
+    <p slot="lead">
+      A template and three AI prompts that get replies. From a former sales leader who built and coached new-logo teams.
+      <PlaceholderNote text="[Guide title pending: Kelsey is choosing between the email template guide and the 4-tier account guide]" />
+    </p>
+  </GuideBand>
 </BaseLayout>
 
 <style>
+  /* Hero */
   .hero {
     position: relative;
-    isolation: isolate;
-    color: var(--color-on-band);
-    padding-block: clamp(3.5rem, 2.5rem + 5vw, 6.5rem);
+    z-index: 2;
+    min-height: 92svh;
+    display: flex;
+    align-items: center;
+    background: var(--forest-900);
+    padding-top: calc(var(--header-h) + clamp(2.5rem, 5vw, 5rem));
+    padding-bottom: clamp(3.5rem, 6vw, 6rem);
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
     overflow: hidden;
   }
 
-  .hero h1 {
-    color: var(--color-on-band-strong);
-    max-width: 20ch;
+  .hero-bg :global(.hero-loop) {
+    opacity: 0.32;
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: min(1100px, 120vw);
+    aspect-ratio: 1;
+    left: -20%;
+    top: -35%;
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--gold-500) 12%, transparent), transparent);
+  }
+
+  .hero-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, var(--forest-900) 0%, color-mix(in srgb, var(--forest-900) 70%, transparent) 55%, transparent 100%),
+      linear-gradient(0deg, var(--forest-900), transparent 30%);
+  }
+
+  .hero-roots {
+    position: absolute;
+    inset: 10% -5% 0 -5%;
+    z-index: 1;
   }
 
   .hero-grid {
     position: relative;
-    z-index: 1;
     display: grid;
-    gap: 2.5rem;
+    gap: 3rem;
     align-items: center;
   }
 
   @media (min-width: 1024px) {
     .hero-grid {
-      grid-template-columns: minmax(0, 45fr) minmax(0, 55fr);
-      gap: 3rem;
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: clamp(3rem, 5vw, 5rem);
     }
 
-    .hero h1 {
-      font-size: clamp(2.5rem, 1.2rem + 2.1vw, 3.1rem);
+    .hero-media {
+      align-self: end;
+      margin-bottom: calc(-1 * clamp(7rem, 10vw, 10rem));
+    }
+
+    .hero {
+      padding-bottom: clamp(5rem, 7vw, 7rem);
     }
   }
 
-  .cards {
-    margin-top: 2.5rem;
+  .hero-title {
+    font-size: clamp(3rem, 5.6vw + 0.6rem, 7rem);
+    max-width: 11ch;
+    margin-bottom: 1.75rem;
+    color: var(--bone-50);
   }
 
+  .w {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    padding-bottom: 0.08em;
+    margin-bottom: -0.08em;
+  }
+
+  .w > span {
+    display: inline-block;
+  }
+
+  :global(.js) .w > span {
+    animation: word-rise 0.9s var(--ease-out) both;
+    animation-delay: calc(0.15s + var(--w) * 0.07s);
+  }
+
+  @keyframes word-rise {
+    from {
+      transform: translateY(105%);
+    }
+  }
+
+  :global(.js) .hero-media {
+    animation: media-in 1s var(--ease-out) both;
+    animation-delay: 0.55s;
+  }
+
+  :global(.js) .hero-lede,
+  :global(.js) .hero .button-row,
+  :global(.js) .credibility {
+    animation: fade-up 0.9s var(--ease-out) both;
+    animation-delay: 0.45s;
+  }
+
+  :global(.js) .credibility {
+    animation-delay: 0.6s;
+  }
+
+  @keyframes media-in {
+    from {
+      opacity: 0;
+      transform: translateY(24px) scale(0.97);
+    }
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
+
+  .hero-lede {
+    max-width: 40ch;
+    color: color-mix(in srgb, var(--bone-50) 82%, transparent);
+  }
+
+  .credibility {
+    list-style: none;
+    margin: 2.75rem 0 0;
+    padding: 1.25rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 0;
+    border-top: 1px solid var(--hairline-dark);
+    font-family: var(--font-ui);
+    font-size: 0.92rem;
+    color: color-mix(in srgb, var(--bone-50) 80%, transparent);
+  }
+
+  .credibility li {
+    padding-right: 1.25rem;
+    margin-right: 1.25rem;
+    border-right: 1px solid var(--hairline-dark);
+  }
+
+  .credibility li:last-child {
+    border-right: 0;
+    margin-right: 0;
+    padding-right: 0;
+  }
+
+  @media (max-width: 639px) {
+    .credibility {
+      flex-direction: column;
+    }
+
+    .credibility li {
+      border-right: 0;
+      padding-right: 0;
+      margin-right: 0;
+    }
+  }
+
+  /* Problem */
+  :global(.problem) {
+    padding-top: calc(var(--space-section) + clamp(0rem, 6vw, 6rem));
+  }
+
+  .problem-grid {
+    display: grid;
+    gap: 3rem;
+  }
+
+  @media (min-width: 1024px) {
+    .problem-grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      gap: clamp(3rem, 6vw, 6rem);
+      align-items: start;
+    }
+
+    .problem-copy {
+      position: sticky;
+      top: calc(var(--header-h) + 3rem);
+    }
+  }
+
+  .problem-visual {
+    position: relative;
+    padding-top: 2rem;
+  }
+
+  .typical {
+    position: relative;
+    display: grid;
+    gap: 0.7rem;
+    width: 82%;
+    padding: 2rem 1.75rem 2.25rem;
+    background: var(--paper);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    transform: rotate(-2deg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .ignored {
+    position: absolute;
+    top: -0.85rem;
+    right: 1.25rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: var(--radius-button);
+    background: var(--clay-700);
+    color: var(--paper);
+    font-family: var(--font-ui);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .sk {
+    display: block;
+    height: 9px;
+    border-radius: var(--radius-button);
+    background: color-mix(in srgb, var(--ink-600) 11%, transparent);
+  }
+
+  .sk-head {
+    width: 45%;
+    height: 12px;
+    margin-bottom: 0.6rem;
+    background: color-mix(in srgb, var(--ink-600) 24%, transparent);
+  }
+
+  .w95 {
+    width: 95%;
+  }
+  .w90 {
+    width: 90%;
+  }
+  .w85 {
+    width: 85%;
+  }
+  .w80 {
+    width: 80%;
+  }
+  .w70 {
+    width: 70%;
+  }
+  .w60 {
+    width: 60%;
+  }
+
+  .approach {
+    position: relative;
+    margin: -4.5rem 0 0 auto;
+    width: min(100%, 92%);
+  }
+
+  @media (max-width: 639px) {
+    .typical {
+      width: 100%;
+    }
+
+    .approach {
+      width: 100%;
+      margin-top: -2.5rem;
+    }
+  }
+
+  .approach-label {
+    display: inline-block;
+    margin: 0 0 0.75rem 1rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: var(--radius-button);
+    background: var(--forest-900);
+    color: var(--bone-50);
+    font-family: var(--font-ui);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+  }
+
+  .approach-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .approach-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 1.25rem;
+    padding: 1.5rem 1.75rem;
+    background: var(--paper);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-md);
+  }
+
+  .approach-num {
+    font-family: var(--font-display);
+    font-size: 2.75rem;
+    line-height: 1;
+    color: var(--gold-700);
+    letter-spacing: -0.03em;
+  }
+
+  .approach-card h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.4rem;
+    font-weight: 500;
+    margin-bottom: 0.35rem;
+  }
+
+  .approach-card h3 :global(.approach-icon) {
+    color: var(--moss-500);
+    flex: none;
+  }
+
+  .approach-card p {
+    margin: 0;
+  }
+
+  /* Method walkthrough */
   .walkthrough {
-    margin-top: 48px;
+    margin-top: clamp(4rem, 8vw, 7rem);
     display: grid;
     justify-items: center;
-    gap: 1rem;
+    gap: 1.25rem;
   }
 
   .walkthrough-label {
     margin: 0;
     font-family: var(--font-ui);
+    font-size: 0.78rem;
     font-weight: 600;
-    letter-spacing: 0.04em;
-    color: var(--color-on-band-strong);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-500);
   }
 
-  .titles {
-    margin-top: 2rem;
-    font-size: var(--step-1);
-    color: var(--color-on-band-strong);
+  /* Track record */
+  .career-line {
+    margin-top: clamp(3rem, 6vw, 5rem);
+    position: relative;
   }
 
-  .teaser {
+  .career-track {
+    height: 40px;
+    margin-bottom: -26px;
+  }
+
+  .career-nodes {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: grid;
-    gap: 2.5rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+    font-family: var(--font-display);
+    font-size: clamp(1rem, 0.8rem + 0.6vw, 1.35rem);
+    line-height: 1.2;
+    color: var(--bone-50);
+  }
+
+  .career-nodes li {
+    display: grid;
+    gap: 0.9rem;
+    justify-items: start;
+  }
+
+  .career-nodes li:last-child {
+    font-style: italic;
+    color: var(--gold-500);
+  }
+
+  .career-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: var(--forest-900);
+    border: 1.5px solid var(--gold-500);
+  }
+
+  .career-nodes li:last-child .career-dot {
+    background: var(--gold-500);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--gold-500) 18%, transparent);
+  }
+
+  @media (max-width: 639px) {
+    .career-track {
+      display: none;
+    }
+
+    .career-nodes {
+      grid-template-columns: 1fr;
+      gap: 0;
+      border-left: 1px solid var(--hairline-gold);
+      margin-left: 6px;
+    }
+
+    .career-nodes li {
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      padding: 0.6rem 0;
+      margin-left: -7px;
+    }
+  }
+
+  .track-link {
+    margin-top: 2.5rem;
+  }
+
+  /* Services */
+  .services {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 900px) {
+    .services {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: stretch;
+    }
+  }
+
+  /* Playbook */
+  .playbook {
+    display: grid;
+    gap: 3rem;
     align-items: center;
   }
 
   @media (min-width: 900px) {
-    .teaser {
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-      gap: 4rem;
+    .playbook {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      gap: clamp(3rem, 7vw, 7rem);
     }
   }
 
-  .teaser-card {
-    max-width: 420px;
-    width: 100%;
+  .playbook-copy :global(.section-header) {
+    margin-bottom: 1.5rem;
   }
 
-  .guide {
-    max-width: 720px;
-    margin-inline: auto;
-    text-align: center;
+  .playbook-summary {
+    margin-top: 1.5rem;
+    font-size: var(--step-1);
   }
 
-  .guide-mark {
-    margin: 0 auto 1.5rem;
-    border-radius: 999px;
-  }
-
-  .guide :global(.guide-swoosh) {
-    margin-inline: auto;
-  }
-
-  .guide .lede {
-    margin-inline: auto;
-  }
-
-  .guide :global(form) {
-    margin-inline: auto;
-    text-align: left;
+  .inside-title {
+    margin: 2rem 0 1rem;
+    font-family: var(--font-ui);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-800);
   }
 </style>

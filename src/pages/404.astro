@@ -1,33 +1,67 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import Section from "../components/Section.astro";
+import Eyebrow from "../components/Eyebrow.astro";
 import Button from "../components/Button.astro";
+import RootLines from "../components/RootLines.astro";
 ---
 
-<BaseLayout title="Page not found" description="This page doesn't exist." noindex>
-  <Section tone="cream" labelledby="nf-title">
-    <div class="nf">
+<BaseLayout title="Page not found" description="This page doesn't exist." noindex overlayHeader footerSignup={false}>
+  <section class="nf tone-dark grain" aria-labelledby="nf-title">
+    <div class="nf-roots" aria-hidden="true">
+      <RootLines variant="hero" tone="gold" />
+    </div>
+    <div class="container nf-inner">
       <p class="code" aria-hidden="true">404</p>
-      <h1 id="nf-title">This page doesn't exist.</h1>
-      <p class="lede">It may have moved, or the link may be wrong.</p>
+      <Eyebrow>Page not found</Eyebrow>
+      <h1 id="nf-title">This lead went <em>cold.</em></h1>
+      <p class="lede">This page doesn't exist. It may have moved, or the link may be wrong.</p>
       <div class="button-row">
         <Button href="/">Back to home</Button>
+        <Button href="/guide/" variant="secondary">Get the free guide</Button>
       </div>
     </div>
-  </Section>
+  </section>
 </BaseLayout>
 
 <style>
   .nf {
-    padding-block: 2rem;
+    position: relative;
+    min-height: 88svh;
+    display: flex;
+    align-items: center;
+    background: var(--forest-900);
+    padding-top: calc(var(--header-h) + 4rem);
+    padding-bottom: 6rem;
+    overflow: hidden;
+  }
+
+  .nf-roots {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0.8;
+  }
+
+  .nf-inner {
+    position: relative;
   }
 
   .code {
     font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(3.5rem, 3rem + 3vw, 5.5rem);
-    line-height: 1;
-    color: var(--color-gold-ink);
-    margin-bottom: 1rem;
+    font-size: clamp(7rem, 18vw, 16rem);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    margin: 0 0 2.5rem;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--gold-500);
+  }
+
+  h1 {
+    font-size: clamp(3rem, 5vw + 1rem, 6.5rem);
+    max-width: 12ch;
+  }
+
+  .lede {
+    max-width: 40ch;
   }
 </style>

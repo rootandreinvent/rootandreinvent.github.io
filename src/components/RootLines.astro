@@ -1,0 +1,151 @@
+---
+interface Props {
+  /** hero: background network; divider: horizontal rule; spine: vertical connector that grows with scroll. */
+  variant?: "hero" | "divider" | "spine";
+  tone?: "gold" | "sage" | "forest";
+  /** Draw the side branches as well as the main root. */
+  branches?: boolean;
+  class?: string;
+}
+
+const { variant = "hero", tone = "gold", branches = true, class: className } = Astro.props;
+
+const shapes = {
+  hero: {
+    viewBox: "0 0 1440 900",
+    paths: [
+      "M-40 860C140 812 260 770 392 716S640 604 760 560 992 470 1120 438 1360 380 1500 300",
+      "M392 716C420 640 452 584 520 532S640 452 690 380",
+      "M760 560C800 500 860 458 940 432S1060 388 1110 316 1170 200 1240 150",
+      "M1120 438C1180 470 1250 498 1330 506S1440 520 1500 560",
+      "M560 640C600 676 668 700 742 704S860 716 912 760",
+      "M940 432C960 380 948 330 990 290",
+      "M180 800C220 742 236 690 300 648",
+      "M1240 150C1290 124 1340 116 1400 120",
+      "M690 380C700 330 736 300 780 270",
+    ],
+    nodes: [
+      [392, 716],
+      [760, 560],
+      [1120, 438],
+      [940, 432],
+      [690, 380],
+      [1240, 150],
+    ],
+    aspect: "xMidYMid slice",
+  },
+  divider: {
+    viewBox: "0 0 1440 80",
+    paths: [
+      "M0 44C180 36 320 52 480 44S800 30 960 40 1260 52 1440 40",
+      "M480 44C520 26 570 18 630 16",
+      "M960 40C1000 58 1046 66 1100 66",
+      "M220 42C250 58 284 66 330 68",
+      "M1240 46C1270 30 1310 22 1360 22",
+    ],
+    nodes: [],
+    aspect: "none",
+  },
+  spine: {
+    viewBox: "0 0 40 1000",
+    paths: ["M20 0C26 80 14 160 20 250S28 420 18 500 12 680 22 760 16 920 20 1000"],
+    nodes: [],
+    aspect: "none",
+  },
+};
+
+const base = shapes[variant];
+const shape = branches ? base : { ...base, paths: base.paths.slice(0, 1), nodes: [] };
+---
+
+<svg
+  class:list={["root-lines", `root-${variant}`, `root-${tone}`, className]}
+  viewBox={shape.viewBox}
+  preserveAspectRatio={shape.aspect}
+  aria-hidden="true"
+  focusable="false"
+  data-root-lines={variant}
+>
+  {
+    shape.paths.map((d, i) => (
+      <path d={d} pathLength="1" style={`--i: ${i}`} />
+    ))
+  }
+  {shape.nodes.map(([cx, cy], i) => <circle cx={cx} cy={cy} r="3" style={`--i: ${i + 2}`} />)}
+</svg>
+
+<style>
+  .root-lines {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.25;
+    stroke-linecap: round;
+  }
+
+  circle {
+    fill: currentColor;
+  }
+
+  .root-gold {
+    color: color-mix(in srgb, var(--gold-500) 45%, transparent);
+  }
+
+  .root-sage {
+    color: color-mix(in srgb, var(--sage-200) 35%, transparent);
+  }
+
+  .root-forest {
+    color: color-mix(in srgb, var(--forest-900) 22%, transparent);
+  }
+
+  .root-spine path {
+    stroke-width: 1.5;
+  }
+
+  /* Draw-in: hidden only when JS can reveal it. */
+  :global(.js) .root-lines[data-root-lines="hero"] path,
+  :global(.js) .root-lines[data-root-lines="divider"] path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 2.6s var(--ease-out);
+    transition-delay: calc(var(--i) * 140ms);
+  }
+
+  :global(.js) .root-lines circle {
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    transition-delay: calc(var(--i) * 220ms + 0.8s);
+  }
+
+  :global(.js) .root-lines.is-drawn path {
+    stroke-dashoffset: 0;
+  }
+
+  :global(.js) .root-lines.is-drawn circle {
+    opacity: 1;
+  }
+
+  /* Spine grows with scroll progress (set by the motion script). */
+  :global(.js) .root-spine path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: calc(1 - var(--progress, 1));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .root-lines path {
+      stroke-dashoffset: 0 !important;
+    }
+    :global(.js) .root-lines circle {
+      opacity: 1;
+    }
+  }
+</style>

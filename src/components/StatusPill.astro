@@ -1,0 +1,43 @@
+---
+interface Props {
+  label?: string;
+  class?: string;
+}
+
+const { label = "Coming soon", class: className } = Astro.props;
+---
+
+<span class:list={["status-pill", className]}>
+  <span class="dot" aria-hidden="true"></span>
+  {label}
+</span>
+
+<style>
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: var(--radius-button);
+    border: 1px solid var(--hairline-gold);
+    background: color-mix(in srgb, var(--gold-500) 12%, transparent);
+    color: var(--gold-800);
+    font-family: var(--font-ui);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: currentColor;
+  }
+
+  :global(.tone-dark) .status-pill {
+    color: var(--gold-500);
+  }
+</style>

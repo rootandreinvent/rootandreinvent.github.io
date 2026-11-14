@@ -2,18 +2,32 @@
 import { Image } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Section from "../components/Section.astro";
+import SectionHeader from "../components/SectionHeader.astro";
 import Eyebrow from "../components/Eyebrow.astro";
-import StepCard from "../components/StepCard.astro";
 import StatPanel from "../components/StatPanel.astro";
 import BookCallButton from "../components/BookCallButton.astro";
 import BrandVideo from "../components/BrandVideo.astro";
 import PlaceholderNote from "../components/PlaceholderNote.astro";
 import CareerPath from "../components/CareerPath.astro";
-import Card from "../components/Card.astro";
+import Icon, { type IconName } from "../components/Icon.astro";
 import { builds } from "../data/credentials";
 import { personLd, videoLd } from "../lib/jsonld";
 import { videoProps } from "../lib/video";
 import portrait from "../assets/kelsey-interim.jpg";
+
+const buildIcons: IconName[] = ["dashboard", "layers", "revive", "dialogue", "flag", "calendar"];
+
+const principles = [
+  {
+    title: "An invitation, not a pitch.",
+    body: "You are not asking them to buy. You are asking whether a conversation is worth their time.",
+  },
+  { title: "Never invent a number.", body: "Use only results you're approved to share. Don't round up." },
+  {
+    title: "Small asks, real proof.",
+    body: "A similar customer, a real challenge, a measurable result, and a 15 to 20 minute ask.",
+  },
+];
 ---
 
 <BaseLayout
@@ -21,21 +35,25 @@ import portrait from "../assets/kelsey-interim.jpg";
   description="Kelsey Dalton is a revenue and go-to-market leader with more than ten years in sales who led net-new-logo teams in enterprise technology. Now she teaches the Repeat Success Method."
   jsonLd={[personLd(Astro.site), videoLd("main", Astro.site)]}
 >
-  <Section tone="cream" labelledby="about-title">
+  <Section tone="cream" labelledby="about-title" class="about-hero">
     <div class="about">
       <figure class="portrait">
-        <Image
-          src={portrait}
-          alt="Kelsey Dalton, founder of Root & Reinvent"
-          widths={[328, 656]}
-          sizes="(min-width: 900px) 328px, 80vw"
-          loading="eager"
-        />
+        <span class="portrait-offset" aria-hidden="true"></span>
+        <div class="portrait-frame">
+          <Image
+            src={portrait}
+            alt="Kelsey Dalton, founder of Root & Reinvent"
+            widths={[360, 720]}
+            sizes="(min-width: 900px) 360px, 80vw"
+            loading="eager"
+            fetchpriority="high"
+          />
+        </div>
         <PlaceholderNote text="[TODO: professional headshot; this is a low-resolution interim crop]" />
       </figure>
-      <div>
+      <div class="about-copy">
         <Eyebrow>About</Eyebrow>
-        <h1 id="about-title">About Kelsey</h1>
+        <h1 id="about-title">About <em>Kelsey</em></h1>
         <p class="lede">
           I'm a revenue and go-to-market leader with more than ten years in sales, most of it in enterprise technology.
           I started in inside sales, came into tech as a BDR, moved up through account executive roles, then led
@@ -52,57 +70,73 @@ import portrait from "../assets/kelsey-interim.jpg";
         </div>
       </div>
     </div>
-    <div class="about-video">
-      <BrandVideo {...videoProps("main")} maxWidth="880px" />
+    <div class="about-video" data-reveal>
+      <BrandVideo {...videoProps("main")} maxWidth="1000px" />
     </div>
   </Section>
 
-  <Section tone="band" id="record" labelledby="record-title">
-    <Eyebrow>Track record</Eyebrow>
-    <h2 id="record-title">
+  <Section tone="band" id="record" labelledby="record-title" glow>
+    <SectionHeader id="record-title" eyebrow="Track record">
       10+ years of winning new logos and leading the teams that win them.
       <span class="accent">The results behind the method.</span>
-    </h2>
-    <StatPanel />
+    </SectionHeader>
+    <StatPanel layout="grid" />
   </Section>
 
   <Section tone="cream" labelledby="path-title">
-    <Eyebrow>Career path</Eyebrow>
-    <h2 id="path-title">From inside sales rep to Senior Director.</h2>
-    <p class="lede">Every step was about landing new logos, first as a seller, then as the leader building the team.</p>
+    <SectionHeader id="path-title" eyebrow="Career path">
+      From inside sales rep to <em>Senior Director.</em>
+      <p slot="lead">Every step was about landing new logos, first as a seller, then as the leader building the team.</p>
+    </SectionHeader>
     <CareerPath />
   </Section>
 
-  <Section tone="band" labelledby="built-title">
-    <Eyebrow>What I built</Eyebrow>
-    <h2 id="built-title">The systems behind the numbers.</h2>
-    <ul class="grid grid-3 builds" role="list">
+  <Section tone="deep" labelledby="built-title">
+    <SectionHeader id="built-title" eyebrow="What I built">
+      The systems behind <em>the numbers.</em>
+    </SectionHeader>
+    <ul class="builds" role="list" data-reveal-group>
       {
-        builds.map((item) => (
-          <Card tag="li">
+        builds.map((item, i) => (
+          <li class="build" data-reveal>
+            <span class="build-top">
+              <span class="build-icon">
+                <Icon name={buildIcons[i] ?? "check"} size={22} />
+              </span>
+              <span class="build-num" aria-hidden="true">
+                0{i + 1}
+              </span>
+            </span>
             <h3>{item.title}</h3>
             <p>{item.body}</p>
-          </Card>
+          </li>
         ))
       }
     </ul>
   </Section>
 
   <Section tone="cream" labelledby="how-title">
-    <Eyebrow>How I work</Eyebrow>
-    <h2 id="how-title">Three principles.</h2>
-    <div class="grid grid-3 cards">
-      <StepCard numeral="1" title="An invitation, not a pitch.">
-        You are not asking them to buy. You are asking whether a conversation is worth their time.
-      </StepCard>
-      <StepCard numeral="2" title="Never invent a number.">
-        Use only results you're approved to share. Don't round up.
-      </StepCard>
-      <StepCard numeral="3" title="Small asks, real proof.">
-        A similar customer, a real challenge, a measurable result, and a 15 to 20 minute ask.
-      </StepCard>
+    <div class="principles-wrap">
+      <SectionHeader id="how-title" eyebrow="How I work">
+        Three <em>principles.</em>
+      </SectionHeader>
+      <ol class="principles" role="list">
+        {
+          principles.map((p, i) => (
+            <li class="principle" data-reveal>
+              <span class="principle-num" aria-hidden="true">
+                0{i + 1}
+              </span>
+              <div>
+                <h3>{p.title}</h3>
+                <p>{p.body}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
     </div>
-    <div class="button-row">
+    <div class="button-row principles-cta">
       <BookCallButton />
     </div>
   </Section>
@@ -111,52 +145,193 @@ import portrait from "../assets/kelsey-interim.jpg";
 <style>
   .about {
     display: grid;
-    gap: 2.5rem;
+    gap: 3rem;
     align-items: center;
   }
 
   @media (min-width: 900px) {
     .about {
-      grid-template-columns: 328px minmax(0, 1fr);
-      gap: 4rem;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: clamp(3rem, 7vw, 7rem);
     }
   }
 
   .portrait {
-    margin: 0;
-    max-width: 328px;
+    position: relative;
+    margin: 0 1.25rem 1.25rem 0;
+    max-width: 360px;
+    width: 100%;
   }
 
-  .portrait :global(img) {
+  .portrait-offset {
+    position: absolute;
+    inset: 1.25rem -1.25rem -1.25rem 1.25rem;
+    border: 1px solid var(--gold-700);
+    border-radius: var(--radius-media);
+  }
+
+  .portrait-frame {
+    position: relative;
+    border-radius: var(--radius-media);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    background: var(--forest-900);
+  }
+
+  .portrait-frame::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--gold-500) 10%, transparent),
+      color-mix(in srgb, var(--forest-900) 28%, transparent)
+    );
+    mix-blend-mode: multiply;
+    pointer-events: none;
+  }
+
+  .portrait-frame :global(img) {
     width: 100%;
     aspect-ratio: 4 / 5;
     object-fit: cover;
-    border-radius: var(--radius-card);
-    border: 1.5px solid var(--color-border);
+    filter: saturate(0.88) contrast(1.03);
   }
 
-  .cards,
-  .builds {
-    margin-top: 2.5rem;
-  }
-
-  .builds {
-    list-style: none;
-    padding: 0;
-  }
-
-  .builds h3 {
-    margin-bottom: 0.5rem;
-    text-wrap: pretty;
-  }
-
-  .builds p {
-    margin: 0;
+  .about-copy :global(h1) {
+    font-size: clamp(3rem, 4vw + 1rem, 5.5rem);
   }
 
   .about-video {
     display: grid;
     justify-items: center;
-    margin-top: clamp(3rem, 2rem + 3vw, 4.5rem);
+    margin-top: clamp(4rem, 8vw, 7rem);
+  }
+
+  /* What I built: case-study tiles */
+  .builds {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1px;
+    background: var(--hairline-dark);
+    border: 1px solid var(--hairline-dark);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+  }
+
+  @media (min-width: 700px) {
+    .builds {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .builds {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .build {
+    position: relative;
+    padding: clamp(1.75rem, 1.4rem + 1.2vw, 2.5rem);
+    background: var(--forest-950);
+    transition: background-color 0.4s ease;
+  }
+
+  .build:hover {
+    background: color-mix(in srgb, var(--forest-900) 70%, var(--forest-950));
+  }
+
+  .build-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .build-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 999px;
+    border: 1px solid var(--hairline-gold);
+    color: var(--gold-500);
+  }
+
+  .build-num {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: color-mix(in srgb, var(--bone-50) 50%, transparent);
+  }
+
+  .build h3 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 0.6rem;
+    text-wrap: pretty;
+  }
+
+  .build p {
+    margin: 0;
+    color: var(--color-on-band);
+  }
+
+  /* Principles: magazine rows */
+  @media (min-width: 1024px) {
+    .principles-wrap {
+      display: grid;
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+      gap: 4rem;
+      align-items: start;
+    }
+  }
+
+  .principles {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--hairline-light);
+  }
+
+  .principle {
+    display: grid;
+    grid-template-columns: clamp(4.5rem, 10vw, 8rem) minmax(0, 1fr);
+    gap: clamp(1rem, 3vw, 3rem);
+    align-items: baseline;
+    padding: clamp(1.75rem, 3vw, 2.75rem) 0;
+    border-bottom: 1px solid var(--hairline-light);
+  }
+
+  .principle-num {
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 7vw, 6rem);
+    line-height: 0.85;
+    letter-spacing: -0.04em;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--gold-700);
+  }
+
+  .principle h3 {
+    font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.5rem);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  .principle p {
+    margin: 0;
+    font-size: var(--step-1);
+  }
+
+  .principles-cta {
+    margin-top: 3rem;
+  }
+
+  @media (min-width: 1024px) {
+    .principles-cta {
+      margin-left: calc((100% - 4rem) / 3 + 4rem);
+    }
   }
 </style>

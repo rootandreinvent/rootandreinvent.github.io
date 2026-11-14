@@ -2,8 +2,10 @@
 import type { GetStaticPaths } from "astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Section from "../../components/Section.astro";
+import SectionHeader from "../../components/SectionHeader.astro";
 import Eyebrow from "../../components/Eyebrow.astro";
-import ProductCover from "../../components/ProductCover.astro";
+import BookMockup from "../../components/BookMockup.astro";
+import StatusPill from "../../components/StatusPill.astro";
 import BuyButton from "../../components/BuyButton.astro";
 import SignupForm from "../../components/SignupForm.astro";
 import PlaceholderNote from "../../components/PlaceholderNote.astro";
@@ -23,8 +25,8 @@ export const getStaticPaths = (async () => {
 const { product } = Astro.props;
 const live = canCheckout(product);
 const status = !live || product.status === "coming-soon" ? "Coming soon" : product.status === "preorder" ? "Pre-order" : null;
-const priceLabel = product.price !== null ? formatPrice(product.price) : "Price coming soon";
 const title = isPlaceholder(product.title) ? "Future product" : product.title;
+const faq = product.faq.length ? product.faq : showPending ? [{ q: "[FAQ: KELSEY TO WRITE]", a: null }] : [];
 const jsonLd =
   live && product.status === "available" && product.price !== null && product.checkoutUrl
     ? productLd({ ...product, price: product.price, checkoutUrl: product.checkoutUrl }, Astro.site)
@@ -37,28 +39,34 @@ const jsonLd =
   footerSignup={false}
   jsonLd={jsonLd}
 >
-  <Section tone="cream" labelledby="product-title">
+  <Section tone="bone" labelledby="product-title" class="product-top">
     <div class="product-hero">
-      <ProductCover title={product.title} subtitle={product.subtitle} size="hero" />
-      <div>
-        {status && <Eyebrow>{status}</Eyebrow>}
+      <div class="product-visual" data-reveal>
+        <BookMockup title={product.title} subtitle={product.subtitle} width="clamp(240px, 60vw, 400px)" />
+      </div>
+      <div class="product-copy">
+        <Eyebrow>{product.slug === "repeat-success-playbook" ? "The playbook" : "Shop"}</Eyebrow>
         <h1 id="product-title">
           {isPlaceholder(product.title) ? <PlaceholderNote text={product.title} /> : product.title}
         </h1>
         {!isPlaceholder(product.subtitle) && <p class="subtitle">{product.subtitle}</p>}
-        <p class="price">{priceLabel}</p>
+        <div class="status-row">
+          {status && <StatusPill label={status} />}
+          {product.price !== null && <span class="price">{formatPrice(product.price)}</span>}
+        </div>
+        {isPlaceholder(product.summary) ? <PlaceholderNote text={product.summary} /> : <p class="summary">{product.summary}</p>}
         <BuyButton product={product} waitlistHref="#waitlist" />
 
         {
           product.includes.length > 0 && (
-            <>
+            <div class="included">
               <h2 class="small-heading">What's included</h2>
-              <ul class="check-list">
+              <ul class="check-list" role="list">
                 {product.includes.map((item) => (
                   <li>{item}</li>
                 ))}
               </ul>
-            </>
+            </div>
           )
         }
       </div>
@@ -68,10 +76,11 @@ const jsonLd =
   {
     product.slug === "repeat-success-playbook" && (
       <Section tone="band" labelledby="how-title">
-        <Eyebrow>See how it works</Eyebrow>
-        <h2 id="how-title">The method in three minutes.</h2>
-        <div class="how-video">
-          <BrandVideo {...videoProps("walkthrough")} maxWidth="880px" />
+        <SectionHeader id="how-title" eyebrow="See how it works">
+          The method in <em>three minutes.</em>
+        </SectionHeader>
+        <div class="how-video" data-reveal>
+          <BrandVideo {...videoProps("walkthrough")} maxWidth="1000px" />
         </div>
       </Section>
     )
@@ -79,100 +88,161 @@ const jsonLd =
 
   {
     product.sections.length > 0 && (
-      <Section tone="bordered" labelledby="inside-title">
-        <h2 id="inside-title">What's inside</h2>
-        <ol class="sections">
-          {product.sections.map((section) => (
-            <li>{section}</li>
-          ))}
-        </ol>
+      <Section tone="cream" labelledby="inside-title">
+        <div class="inside">
+          <div>
+            <SectionHeader id="inside-title" eyebrow="The chapters">
+              What's <em>inside.</em>
+            </SectionHeader>
+            <div class="for">
+              <h2 class="small-heading">Who it's for</h2>
+              {isPlaceholder(product.audience) ? <PlaceholderNote text={product.audience} /> : <p>{product.audience}.</p>}
+              {product.guarantee && <p class="guarantee">{product.guarantee}</p>}
+              {!product.guarantee && <PlaceholderNote text="[Pending: guarantee and refund terms not set]" />}
+            </div>
+          </div>
+          <ol class="sections" role="list">
+            {product.sections.map((section, i) => (
+              <li data-reveal>
+                <span class="section-num" aria-hidden="true">
+                  0{i + 1}
+                </span>
+                <span>{section}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
       </Section>
     )
   }
 
-  <Section tone="cream" labelledby="for-title">
-    <h2 id="for-title">Who it's for</h2>
-    {isPlaceholder(product.audience) ? <PlaceholderNote text={product.audience} /> : <p class="lede">{product.audience}.</p>}
+  {
+    faq.length > 0 && (
+      <Section tone="bone">
+        <Faq items={faq} />
+      </Section>
+    )
+  }
 
-    <div class="faq-wrap">
-      <Faq items={product.faq.length ? product.faq : showPending ? [{ q: "[FAQ: KELSEY TO WRITE]", a: null }] : []} />
-    </div>
-
-    {product.guarantee && <p class="guarantee">{product.guarantee}</p>}
-    {!product.guarantee && <PlaceholderNote text="[Pending: guarantee and refund terms not set]" />}
-  </Section>
-
-  <Section tone="band" labelledby="waitlist-title" id="waitlist">
-    <div class="waitlist">
-      <h2 id="waitlist-title">Join the waitlist.</h2>
-      <p class="lede">One email when it's ready.</p>
-      <SignupForm
-        source={`product-${product.slug}`}
-        tag={`waitlist-${product.slug}`}
-        buttonLabel="Join the waitlist"
-      />
+  <Section tone="deep" labelledby="waitlist-title" id="waitlist" glow>
+    <div class="waitlist" data-reveal>
+      <SectionHeader id="waitlist-title" eyebrow="Coming soon">
+        Join the <em>waitlist.</em>
+        <p slot="lead">One email when it's ready.</p>
+      </SectionHeader>
+      <SignupForm source={`product-${product.slug}`} tag={`waitlist-${product.slug}`} buttonLabel="Join the waitlist" />
     </div>
   </Section>
 </BaseLayout>
 
 <style>
+  :global(.product-top) {
+    padding-top: clamp(3rem, 6vw, 6rem);
+  }
+
   .product-hero {
     display: grid;
-    gap: 2.5rem;
-    align-items: start;
+    gap: 3rem;
+    align-items: center;
   }
 
   @media (min-width: 900px) {
     .product-hero {
-      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-      gap: 4rem;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: clamp(3rem, 7vw, 7rem);
     }
   }
 
-  .product-hero :global(.cover) {
-    max-width: 440px;
+  .product-copy h1 {
+    font-size: clamp(2.75rem, 3.5vw + 1rem, 5rem);
+    margin-bottom: 0.75rem;
   }
 
   .subtitle {
-    font-size: var(--step-1);
-    margin-bottom: 0.5rem;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--step-2);
+    color: var(--gold-800);
+    margin-bottom: 1.5rem;
+  }
+
+  .status-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
   }
 
   .price {
     font-family: var(--font-ui);
     font-weight: 600;
     color: var(--color-heading);
-    margin-bottom: 1.25rem;
+  }
+
+  .summary {
+    font-size: var(--step-1);
+    margin-bottom: 2rem;
+  }
+
+  .included {
+    margin-top: 2.75rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--hairline-light);
+  }
+
+  .small-heading {
+    font-family: var(--font-ui);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-800);
+    margin-bottom: 1rem;
   }
 
   .how-video {
     display: grid;
     justify-items: center;
-    margin-top: 2.5rem;
   }
 
-  .small-heading {
-    font-size: var(--step-1);
-    margin-top: 2.25rem;
+  @media (min-width: 1024px) {
+    .inside {
+      display: grid;
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+      gap: 4rem;
+      align-items: start;
+    }
   }
 
   .sections {
-    margin: 1.5rem 0 0;
-    padding-left: 1.4rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--hairline-light);
+  }
+
+  .sections li {
     display: grid;
-    gap: 0.75rem;
-    max-width: var(--measure);
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    gap: 1rem;
+    align-items: baseline;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--hairline-light);
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 1.05rem + 0.7vw, 1.75rem);
+    line-height: 1.3;
     color: var(--color-heading);
   }
 
-  .sections li::marker {
-    font-family: var(--font-display);
-    font-weight: 700;
-    color: var(--color-gold-ink);
+  .section-num {
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--gold-800);
   }
 
-  .faq-wrap {
-    margin-top: 2.5rem;
+  .for {
+    margin-bottom: 3rem;
+    max-width: 34ch;
   }
 
   .guarantee {
@@ -180,6 +250,6 @@ const jsonLd =
   }
 
   .waitlist {
-    max-width: 720px;
+    max-width: 760px;
   }
 </style>

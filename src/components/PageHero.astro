@@ -1,0 +1,118 @@
+---
+import Eyebrow from "./Eyebrow.astro";
+import RootLines from "./RootLines.astro";
+
+interface Props {
+  eyebrow?: string;
+  id: string;
+  class?: string;
+}
+
+const { eyebrow, id, class: className } = Astro.props;
+const hasAside = Astro.slots.has("aside");
+---
+
+<section class:list={["page-hero tone-dark grain", { "has-aside": hasAside }, className]} aria-labelledby={id}>
+  <div class="page-hero-bg" aria-hidden="true">
+    <span class="page-hero-glow"></span>
+    <div class="page-hero-roots">
+      <RootLines variant="hero" tone="gold" />
+    </div>
+  </div>
+  <div class="container page-hero-grid">
+    <div class="page-hero-copy">
+      {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
+      <h1 id={id}><slot /></h1>
+      {Astro.slots.has("lead") && <div class="page-hero-lead"><slot name="lead" /></div>}
+      {Astro.slots.has("actions") && <div class="button-row"><slot name="actions" /></div>}
+    </div>
+    {hasAside && <div class="page-hero-aside"><slot name="aside" /></div>}
+  </div>
+  <slot name="after" />
+</section>
+
+<style>
+  .page-hero {
+    position: relative;
+    background: var(--forest-900);
+    padding-top: calc(var(--header-h) + clamp(3.5rem, 7vw, 7rem));
+    padding-bottom: clamp(4rem, 8vw, 8rem);
+  }
+
+  .page-hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    overflow: hidden;
+  }
+
+  .page-hero-glow {
+    position: absolute;
+    width: min(1000px, 110vw);
+    aspect-ratio: 1;
+    right: -25%;
+    top: -45%;
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--gold-500) 11%, transparent), transparent);
+  }
+
+  .page-hero-roots {
+    position: absolute;
+    inset: 20% -10% -10% 30%;
+    opacity: 0.7;
+  }
+
+  .page-hero-grid {
+    display: grid;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  @media (min-width: 1024px) {
+    .has-aside .page-hero-grid {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: clamp(3rem, 6vw, 6rem);
+    }
+  }
+
+  h1 {
+    font-size: clamp(3rem, 4.5vw + 1rem, 6rem);
+    max-width: 14ch;
+    margin-bottom: 1.5rem;
+  }
+
+  .page-hero-lead :global(p) {
+    font-size: var(--step-1);
+    line-height: 1.6;
+    max-width: 46ch;
+    color: color-mix(in srgb, var(--bone-50) 82%, transparent);
+  }
+
+  .page-hero-lead :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  :global(.js) .page-hero-copy > * {
+    animation: hero-in 0.9s var(--ease-out) both;
+  }
+
+  :global(.js) .page-hero-copy > :nth-child(2) {
+    animation-delay: 0.08s;
+  }
+  :global(.js) .page-hero-copy > :nth-child(3) {
+    animation-delay: 0.18s;
+  }
+  :global(.js) .page-hero-copy > :nth-child(4) {
+    animation-delay: 0.28s;
+  }
+
+  :global(.js) .page-hero-aside {
+    animation: hero-in 1s var(--ease-out) 0.3s both;
+  }
+
+  @keyframes hero-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+  }
+</style>

@@ -20,16 +20,15 @@ const noteId = `${fieldId}-note`;
 ---
 
 <form
-  class:list={["signup", { compact }]}
+  class:list={["signup", { compact, disabled: !enabled }]}
   id={id}
   method="post"
   action={action ?? undefined}
   novalidate
   data-signup
 >
-  <div class="row">
-    <label for={fieldId} class="label">Email address</label>
-    <div class="controls">
+  <div class="controls">
+    <div class="field">
       <input
         id={fieldId}
         name="email_address"
@@ -37,18 +36,21 @@ const noteId = `${fieldId}-note`;
         autocomplete="email"
         inputmode="email"
         required
-        placeholder="you@company.com"
+        placeholder=" "
         disabled={!enabled}
         aria-describedby={`${errorId} ${noteId}`}
       />
-      <button class="submit" type="submit" disabled={!enabled}>{buttonLabel}</button>
+      <label for={fieldId} class="label">Email address</label>
     </div>
+    <button class="submit" type="submit" disabled={!enabled}>
+      <span class="submit-label">{enabled ? buttonLabel : "Signups open soon"}</span>
+      <span class="spinner" aria-hidden="true"></span>
+    </button>
   </div>
   <input type="hidden" name="fields[source]" value={source} />
   {tag && <input type="hidden" name="fields[signup_tag]" value={tag} />}
   <p class="error" id={errorId} role="alert" hidden>Enter a valid email address.</p>
   <p class="note" id={noteId}>
-    {enabled ? null : <strong>Signups open soon. </strong>}
     We'll only use your email to send what you asked for. See the <a href={url("/privacy/")}>privacy policy</a>.
   </p>
 </form>
@@ -57,7 +59,8 @@ const noteId = `${fieldId}-note`;
   document.querySelectorAll<HTMLFormElement>("form[data-signup]").forEach((form) => {
     const input = form.querySelector<HTMLInputElement>('input[type="email"]');
     const error = form.querySelector<HTMLElement>(".error");
-    if (!input || !error) return;
+    const submit = form.querySelector<HTMLButtonElement>(".submit");
+    if (!input || !error || !submit) return;
 
     const validate = () => {
       const ok = input.checkValidity();
@@ -74,7 +77,10 @@ const noteId = `${fieldId}-note`;
       if (!validate()) {
         event.preventDefault();
         input.focus();
+        return;
       }
+      submit.classList.add("is-loading");
+      submit.setAttribute("aria-busy", "true");
     });
   });
 </script>
@@ -85,72 +91,134 @@ const noteId = `${fieldId}-note`;
     max-width: 560px;
   }
 
-  .label {
-    display: block;
-    font-family: var(--font-ui);
-    font-weight: 600;
-    font-size: 0.95rem;
-    margin-bottom: 0.4rem;
-    color: var(--color-heading);
-  }
-
   .controls {
     display: flex;
     flex-wrap: wrap;
     gap: 0.6rem;
   }
 
-  input[type="email"] {
+  .field {
+    position: relative;
     flex: 1 1 15rem;
-    min-height: 48px;
-    padding: 0.7rem 0.9rem;
+  }
+
+  input[type="email"] {
+    width: 100%;
+    min-height: 56px;
+    padding: 1.45rem 1.1rem 0.45rem;
     font: inherit;
     font-size: 1rem;
     color: var(--color-heading);
     background: var(--color-surface);
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--radius-button);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .label {
+    position: absolute;
+    left: 1.1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    transform-origin: left center;
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    color: var(--color-body);
+    pointer-events: none;
+    transition:
+      transform 0.2s var(--ease-out),
+      top 0.2s var(--ease-out);
+  }
+
+  input:focus + .label,
+  input:not(:placeholder-shown) + .label {
+    top: 0.9rem;
+    transform: translateY(-50%) scale(0.78);
+    font-weight: 600;
   }
 
   input[type="email"]:focus-visible {
-    outline: 3px solid var(--color-teal);
+    outline: 2px solid var(--gold-800);
     outline-offset: 2px;
-    border-color: var(--color-teal);
+    border-color: var(--gold-800);
   }
 
   input[aria-invalid="true"] {
-    border-color: var(--color-gold-ink);
+    border-color: var(--clay-700);
   }
 
   .submit {
+    position: relative;
     flex: 0 0 auto;
-    min-height: 48px;
-    padding: 0.75rem 1.35rem;
+    min-height: 56px;
+    padding: 0.75rem 1.5rem;
     border-radius: var(--radius-button);
-    border: 1.5px solid var(--color-gold);
-    background: var(--color-gold);
-    color: var(--color-band);
+    border: 1px solid var(--forest-900);
+    background: var(--forest-900);
+    color: var(--bone-50);
     font-family: var(--font-ui);
     font-weight: 600;
     font-size: 1rem;
     cursor: pointer;
+    transition:
+      background-color 0.25s ease,
+      transform 0.25s var(--ease-out);
   }
 
   .submit:hover:not([disabled]) {
-    background: var(--color-gold-hover);
+    background: var(--forest-800);
+    transform: translateY(-1px);
+  }
+
+  .spinner {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 18px;
+    height: 18px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 999px;
+    opacity: 0;
+  }
+
+  .submit.is-loading .submit-label {
+    visibility: hidden;
+  }
+
+  .submit.is-loading .spinner {
+    opacity: 1;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   .submit[disabled],
   input[disabled] {
     cursor: not-allowed;
-    opacity: 0.65;
+  }
+
+  .disabled input[disabled] {
+    opacity: 0.7;
+  }
+
+  .submit[disabled] {
+    background: transparent;
+    color: var(--color-heading);
+    border-style: dashed;
   }
 
   .error {
     margin: 0.5rem 0 0;
     font-size: 0.9rem;
     font-weight: 500;
-    color: var(--color-gold-ink);
+    color: var(--clay-700);
   }
 
   .note {
@@ -159,33 +227,52 @@ const noteId = `${fieldId}-note`;
     color: var(--color-body);
   }
 
-  :global(.tone-band) .label,
-  :global(.site-footer) .label {
-    color: var(--color-on-band-strong);
+  :global(.tone-dark) input[type="email"] {
+    background: color-mix(in srgb, var(--bone-50) 7%, transparent);
+    border-color: var(--hairline-dark);
+    color: var(--bone-50);
   }
 
-  :global(.tone-band) .note,
-  :global(.site-footer) .note {
+  :global(.tone-dark) .label {
     color: var(--color-on-band);
   }
 
-  :global(.tone-band) .note a,
-  :global(.site-footer) .note a {
+  :global(.tone-dark) .submit {
+    background: var(--gold-500);
+    border-color: var(--gold-500);
+    color: var(--forest-950);
+  }
+
+  :global(.tone-dark) .submit:hover:not([disabled]) {
+    background: var(--gold-600);
+  }
+
+  :global(.tone-dark) .submit[disabled] {
+    background: transparent;
+    color: var(--gold-500);
+    border-color: var(--gold-500);
+  }
+
+  :global(.tone-dark) .note {
+    color: var(--color-on-band);
+  }
+
+  :global(.tone-dark) .note a {
     color: var(--color-on-band-strong);
   }
 
-  :global(.tone-band) .error,
-  :global(.site-footer) .error {
-    color: var(--color-gold);
+  :global(.tone-dark) .error {
+    color: var(--gold-500);
   }
 
-  :global(.tone-band) input[type="email"]:focus-visible,
-  :global(.site-footer) input[type="email"]:focus-visible {
-    outline-color: var(--color-gold);
-    border-color: var(--color-gold);
+  :global(.tone-dark) input[type="email"]:focus-visible {
+    outline-color: var(--gold-500);
+    border-color: var(--gold-500);
   }
 
-  .compact .label {
-    font-size: 0.9rem;
+  @media (prefers-reduced-motion: reduce) {
+    .submit.is-loading .spinner {
+      animation-duration: 2s;
+    }
   }
 </style>

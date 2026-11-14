@@ -44,6 +44,10 @@ export const site = {
     heroLoop:    "/video/hero-loop.mp4",
   },
 
+  features: {
+    testimonials: false,                       // turn on only with real, approved quotes and logos
+  },
+
   analytics: {
     provider: null as "cloudflare" | "goatcounter" | "plausible" | null,
     siteId: null as string | null,
