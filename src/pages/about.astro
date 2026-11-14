@@ -11,14 +11,15 @@ import PlaceholderNote from "../components/PlaceholderNote.astro";
 import CareerPath from "../components/CareerPath.astro";
 import Card from "../components/Card.astro";
 import { builds } from "../data/credentials";
-import { personLd } from "../lib/jsonld";
+import { personLd, videoLd } from "../lib/jsonld";
+import { videoProps } from "../lib/video";
 import portrait from "../assets/kelsey-interim.jpg";
 ---
 
 <BaseLayout
   title="About Kelsey"
   description="Kelsey Dalton is a revenue and go-to-market leader with more than ten years in sales who led net-new-logo teams in enterprise technology. Now she teaches the Repeat Success Method."
-  jsonLd={personLd(Astro.site)}
+  jsonLd={[personLd(Astro.site), videoLd("main", Astro.site)]}
 >
   <Section tone="cream" labelledby="about-title">
     <div class="about">
@@ -38,7 +39,8 @@ import portrait from "../assets/kelsey-interim.jpg";
         <p class="lede">
           I'm a revenue and go-to-market leader with more than ten years in sales, most of it in enterprise technology.
           I started in inside sales, came into tech as a BDR, moved up through account executive roles, then led
-          net-new-logo teams as a sales manager, a Regional Sales Director and a Senior Director.
+          net-new-logo teams as a sales manager, a Regional Sales Director, a Regional Vice President and a Senior
+          Director.
         </p>
         <p>
           I've driven new-logo growth across SaaS, AI, cloud and manufacturing. Landing new logos was the job. I built a
@@ -49,6 +51,9 @@ import portrait from "../assets/kelsey-interim.jpg";
           <BookCallButton />
         </div>
       </div>
+    </div>
+    <div class="about-video">
+      <BrandVideo {...videoProps("main")} maxWidth="880px" />
     </div>
   </Section>
 
@@ -97,17 +102,8 @@ import portrait from "../assets/kelsey-interim.jpg";
         A similar customer, a real challenge, a measurable result, and a 15 to 20 minute ask.
       </StepCard>
     </div>
-  </Section>
-
-  <Section tone="bordered" labelledby="video-title">
-    <div class="video">
-      <div>
-        <h2 id="video-title">The Repeat Success Method, in 78 seconds.</h2>
-        <div class="button-row">
-          <BookCallButton />
-        </div>
-      </div>
-      <BrandVideo cut="main" />
+    <div class="button-row">
+      <BookCallButton />
     </div>
   </Section>
 </BaseLayout>
@@ -158,16 +154,9 @@ import portrait from "../assets/kelsey-interim.jpg";
     margin: 0;
   }
 
-  .video {
+  .about-video {
     display: grid;
-    gap: 2rem;
-    align-items: center;
-  }
-
-  @media (min-width: 900px) {
-    .video {
-      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-      gap: 4rem;
-    }
+    justify-items: center;
+    margin-top: clamp(3rem, 2rem + 3vw, 4.5rem);
   }
 </style>

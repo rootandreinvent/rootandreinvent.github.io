@@ -26,6 +26,21 @@ export function personLd(base?: URL) {
   };
 }
 
+export function videoLd(key: "main" | "walkthrough", base?: URL) {
+  const video = site.video[key];
+  const [minutes, seconds] = video.duration.split(":").map(Number);
+  return {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name: video.title,
+    description: video.description,
+    thumbnailUrl: abs(video.poster, base),
+    contentUrl: abs(video.src, base),
+    uploadDate: site.video.uploadDate,
+    duration: `PT${minutes}M${seconds}S`,
+  };
+}
+
 export function productLd(
   product: { title: string; summary: string; slug: string; price: number; checkoutUrl: string },
   base?: URL,

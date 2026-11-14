@@ -24,6 +24,26 @@ export const site = {
     currency: "USD",
   },
 
+  video: {
+    uploadDate: "2026-11-13",
+    main: {
+      src: "/video/brand-main.mp4", poster: "/video/poster.jpg", captions: "/video/brand-main.en.vtt", duration: "1:39",
+      title: "Root & Reinvent: what the Repeat Success Method is and who built it",
+      description: "What the Repeat Success Method is, who built it, and the three-part first email at its heart.",
+    },
+    walkthrough: {
+      src: "/video/walkthrough.mp4", poster: "/video/walkthrough-poster.jpg", captions: "/video/walkthrough.en.vtt", duration: "3:05",
+      title: "The Repeat Success Method: a 3-minute walkthrough",
+      description: "A walkthrough of all four parts of the Repeat Success Method: Prioritize, People, Proof and Persistence.",
+    },
+    teaser: {
+      src: "/video/teaser-4x5.mp4", poster: "/video/teaser-poster.jpg", captions: "/video/teaser.en.vtt", duration: "0:28",
+      title: "Root & Reinvent in 30 seconds",
+      description: "The Repeat Success Method in 30 seconds.",
+    },
+    heroLoop:    "/video/hero-loop.mp4",
+  },
+
   analytics: {
     provider: null as "cloudflare" | "goatcounter" | "plausible" | null,
     siteId: null as string | null,

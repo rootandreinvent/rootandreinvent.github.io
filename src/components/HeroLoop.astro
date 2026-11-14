@@ -1,23 +1,33 @@
 ---
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { site } from "../config/site";
 import { url } from "../lib/url";
 
-const dir = join(process.cwd(), "public", "video");
-const hasMp4 = existsSync(join(dir, "hero-loop.mp4"));
-const hasWebm = existsSync(join(dir, "hero-loop.webm"));
+const src = existsSync(join(process.cwd(), "public", site.video.heroLoop)) ? url(site.video.heroLoop) : undefined;
 ---
 
-<div class="hero-loop" aria-hidden="true">
-  {
-    (hasMp4 || hasWebm) && (
-      <video muted autoplay loop playsinline preload="metadata" tabindex="-1">
-        {hasWebm && <source src={url("/video/hero-loop.webm")} type="video/webm" />}
-        {hasMp4 && <source src={url("/video/hero-loop.mp4")} type="video/mp4" />}
-      </video>
-    )
+<div class="hero-loop" aria-hidden="true" data-hero-loop data-src={src}></div>
+
+<script>
+  const holder = document.querySelector<HTMLElement>("[data-hero-loop]");
+  const src = holder?.dataset.src;
+  // Decorative: skipped on small screens (data) and under reduced motion.
+  if (holder && src && matchMedia("(min-width: 768px) and (prefers-reduced-motion: no-preference)").matches) {
+    const video = document.createElement("video");
+    video.muted = true;
+    video.defaultMuted = true;
+    video.loop = true;
+    video.autoplay = true;
+    video.playsInline = true;
+    video.preload = "auto";
+    video.tabIndex = -1;
+    video.setAttribute("aria-hidden", "true");
+    video.src = src;
+    holder.append(video);
+    video.play().catch(() => {});
   }
-</div>
+</script>
 
 <style>
   .hero-loop {
@@ -33,15 +43,14 @@ const hasWebm = existsSync(join(dir, "hero-loop.webm"));
       var(--color-band);
   }
 
-  video {
+  .hero-loop :global(video) {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.55;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    video {
+  @media (max-width: 767px) {
+    .hero-loop :global(video) {
       display: none;
     }
   }

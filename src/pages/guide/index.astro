@@ -5,6 +5,7 @@ import Eyebrow from "../../components/Eyebrow.astro";
 import SignupForm from "../../components/SignupForm.astro";
 import BrandVideo from "../../components/BrandVideo.astro";
 import PlaceholderNote from "../../components/PlaceholderNote.astro";
+import { videoProps } from "../../lib/video";
 ---
 
 <BaseLayout
@@ -30,7 +31,7 @@ import PlaceholderNote from "../../components/PlaceholderNote.astro";
         </p>
       </div>
       <div class="media">
-        <BrandVideo cut="teaser" />
+        <BrandVideo {...videoProps("teaser")} aspect="4/5" maxWidth="420px" />
       </div>
     </div>
   </Section>
@@ -45,13 +46,15 @@ import PlaceholderNote from "../../components/PlaceholderNote.astro";
 
   @media (min-width: 1024px) {
     .guide {
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
       gap: 4rem;
     }
+  }
 
+  @media (max-width: 1023px) {
     .media {
-      position: sticky;
-      top: 2rem;
+      display: grid;
+      justify-items: center;
     }
   }
 

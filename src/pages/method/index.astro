@@ -5,7 +5,10 @@ import Eyebrow from "../../components/Eyebrow.astro";
 import StepCard from "../../components/StepCard.astro";
 import EmailAnatomy from "../../components/EmailAnatomy.astro";
 import SignupForm from "../../components/SignupForm.astro";
+import BrandVideo from "../../components/BrandVideo.astro";
 import { getMethodPosts, methodPillars } from "../../lib/content";
+import { videoLd } from "../../lib/jsonld";
+import { videoProps } from "../../lib/video";
 
 const published = new Set((await getMethodPosts()).map((p) => p.data.slug));
 ---
@@ -14,6 +17,7 @@ const published = new Set((await getMethodPosts()).map((p) => p.data.slug));
   title="The Repeat Success Method"
   description="A repeatable way to land new logos in four parts: Prioritize, People, Proof and Persistence. Plus the three-part first email."
   footerSignup={false}
+  jsonLd={videoLd("walkthrough", Astro.site)}
 >
   <Section tone="band" labelledby="method-title">
     <Eyebrow>The method</Eyebrow>
@@ -22,6 +26,9 @@ const published = new Set((await getMethodPosts()).map((p) => p.data.slug));
       A repeatable way to land new logos: a short, researched, proof-based first email that earns a 15 to 20 minute
       meeting, and the work around it.
     </p>
+    <div class="walkthrough">
+      <BrandVideo {...videoProps("walkthrough")} maxWidth="880px" />
+    </div>
     <div class="grid grid-4 cards">
       {
         methodPillars.map((p) => (
@@ -59,6 +66,12 @@ const published = new Set((await getMethodPosts()).map((p) => p.data.slug));
 
 <style>
   .cards {
+    margin-top: 2.5rem;
+  }
+
+  .walkthrough {
+    display: grid;
+    justify-items: center;
     margin-top: 2.5rem;
   }
 

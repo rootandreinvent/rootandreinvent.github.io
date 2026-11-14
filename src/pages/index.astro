@@ -18,7 +18,8 @@ import BrandVideo from "../components/BrandVideo.astro";
 import HeroLoop from "../components/HeroLoop.astro";
 import PlaceholderNote from "../components/PlaceholderNote.astro";
 import { getServices, getProducts, getMethodPosts, methodPillars } from "../lib/content";
-import { organizationLd, personLd } from "../lib/jsonld";
+import { organizationLd, personLd, videoLd } from "../lib/jsonld";
+import { videoProps } from "../lib/video";
 
 const services = await getServices();
 const products = await getProducts();
@@ -29,7 +30,7 @@ const published = new Set((await getMethodPosts()).map((p) => p.data.slug));
 <BaseLayout
   description="New-logo sales consulting from Kelsey Dalton. A repeatable method for sales reps, managers and founders: researched outreach, real proof and a small ask."
   footerSignup={false}
-  jsonLd={[organizationLd(Astro.site), personLd(Astro.site)]}
+  jsonLd={[organizationLd(Astro.site), personLd(Astro.site), videoLd("main", Astro.site)]}
 >
   <section class="hero tone-band" aria-labelledby="hero-title">
     <HeroLoop />
@@ -48,7 +49,11 @@ const published = new Set((await getMethodPosts()).map((p) => p.data.slug));
         </div>
       </div>
       <div class="hero-media">
-        <BrandVideo cut="main" />
+        <BrandVideo
+          {...videoProps("main")}
+          eager
+          sizes="(min-width: 1120px) 570px, (min-width: 1024px) 52vw, 100vw"
+        />
       </div>
     </div>
   </section>
@@ -92,6 +97,10 @@ const published = new Set((await getMethodPosts()).map((p) => p.data.slug));
         ))
       }
     </div>
+    <div class="walkthrough">
+      <p class="walkthrough-label">Watch the walkthrough: 3 minutes</p>
+      <BrandVideo {...videoProps("walkthrough")} maxWidth="880px" />
+    </div>
   </Section>
 
   <Section tone="cream" labelledby="email-title">
@@ -105,7 +114,7 @@ const published = new Set((await getMethodPosts()).map((p) => p.data.slug));
     <h2 id="track-title">10+ years of winning new logos and leading the teams that win them.</h2>
     <StatPanel featuredOnly />
     <p class="titles">
-      From inside sales rep to Regional Sales Director and Senior Director.
+      From inside sales rep to Regional Sales Director, Regional Vice President and Senior Director.
       <PlaceholderNote text="[KELSEY TO CONFIRM titles and order]" />
     </p>
     <div class="button-row">
@@ -183,13 +192,32 @@ const published = new Set((await getMethodPosts()).map((p) => p.data.slug));
 
   @media (min-width: 1024px) {
     .hero-grid {
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+      grid-template-columns: minmax(0, 45fr) minmax(0, 55fr);
       gap: 3rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 1.2rem + 2.1vw, 3.1rem);
     }
   }
 
   .cards {
     margin-top: 2.5rem;
+  }
+
+  .walkthrough {
+    margin-top: 48px;
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+  }
+
+  .walkthrough-label {
+    margin: 0;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--color-on-band-strong);
   }
 
   .titles {

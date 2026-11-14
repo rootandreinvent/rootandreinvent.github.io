@@ -5,7 +5,6 @@ import Eyebrow from "../components/Eyebrow.astro";
 import BookCallButton from "../components/BookCallButton.astro";
 import PlaceholderNote from "../components/PlaceholderNote.astro";
 import Faq from "../components/Faq.astro";
-import BrandVideo from "../components/BrandVideo.astro";
 import { getServices } from "../lib/content";
 import { isPlaceholder } from "../lib/placeholders";
 import { formatPrice } from "../lib/commerce";
@@ -19,18 +18,13 @@ const services = await getServices();
   description="1:1 coaching, team workshops and fractional sales leadership for new-logo sales. Book a 15 to 20 minute call with Kelsey Dalton."
 >
   <Section tone="band" labelledby="wwm-title">
-    <div class="intro">
-      <div>
-        <h1 id="wwm-title">Work with me</h1>
-        <p class="lede">
-          I've built new-logo teams, coached reps from their first email to their first big win, and run the cadences
-          that keep a team finding deals. Here's how I can help yours.
-        </p>
-        <div class="button-row">
-          <BookCallButton />
-        </div>
-      </div>
-      <BrandVideo cut="main" />
+    <h1 id="wwm-title">Work with me</h1>
+    <p class="lede">
+      I've built new-logo teams, coached reps from their first email to their first big win, and run the cadences that
+      keep a team finding deals. Here's how I can help yours.
+    </p>
+    <div class="button-row">
+      <BookCallButton />
     </div>
   </Section>
 
@@ -89,19 +83,6 @@ const services = await getServices();
 </BaseLayout>
 
 <style>
-  .intro {
-    display: grid;
-    gap: 2.5rem;
-    align-items: center;
-  }
-
-  @media (min-width: 1024px) {
-    .intro {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: 3.5rem;
-    }
-  }
-
   .service {
     display: grid;
     gap: 2rem;
