@@ -103,11 +103,14 @@ const published = new Set((await getMethodPosts()).map((p) => p.data.slug));
   <Section tone="band" labelledby="track-title">
     <Eyebrow>Track record</Eyebrow>
     <h2 id="track-title">Built and led new-logo teams for 10+ years.</h2>
-    <StatPanel />
+    <StatPanel featuredOnly />
     <p class="titles">
       From BDR to Regional Sales Director and Regional Vice President.
       <PlaceholderNote text="[KELSEY TO CONFIRM titles and order]" />
     </p>
+    <div class="button-row">
+      <Button href="/about/#record" variant="secondary">See the full track record</Button>
+    </div>
   </Section>
 
   <Section tone="cream" labelledby="help-title">

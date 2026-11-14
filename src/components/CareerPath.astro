@@ -1,0 +1,115 @@
+---
+import { career } from "../data/credentials";
+import PlaceholderNote from "./PlaceholderNote.astro";
+---
+
+<ol class="path" role="list">
+  {
+    career.map((role, i) => (
+      <li class="role">
+        <span class="step" aria-hidden="true">{i + 1}</span>
+        <div class="body">
+          {role.context && <p class="context">{role.context}</p>}
+          <h3>
+            {role.title}
+            {role.titlePending && <PlaceholderNote text="[KELSEY TO CONFIRM title]" />}
+          </h3>
+          <ul class="check-list" role="list">
+            {role.highlights.map((item) => <li>{item}</li>)}
+          </ul>
+        </div>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .path {
+    list-style: none;
+    margin: 2.5rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .role {
+    position: relative;
+    display: grid;
+    grid-template-columns: 2.75rem minmax(0, 1fr);
+    gap: 1.25rem;
+  }
+
+  .role:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    left: calc(1.375rem - 1px);
+    top: 2.75rem;
+    bottom: -1rem;
+    width: 2px;
+    background: var(--color-border);
+  }
+
+  .step {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: var(--color-gold);
+    color: var(--color-band);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.15rem;
+  }
+
+  .body {
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-card);
+    padding: 1.25rem clamp(1.25rem, 1rem + 1vw, 1.75rem) 0.25rem;
+  }
+
+  .context {
+    margin: 0 0 0.25rem;
+    font-family: var(--font-ui);
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-teal);
+  }
+
+  h3 {
+    margin-bottom: 0.75rem;
+  }
+
+  .check-list {
+    margin-bottom: 1.25rem;
+  }
+
+  .check-list li {
+    max-width: var(--measure);
+  }
+
+  @media (max-width: 639px) {
+    .role {
+      grid-template-columns: 2rem minmax(0, 1fr);
+      gap: 0.75rem;
+    }
+
+    .role:not(:last-child)::before {
+      left: calc(1rem - 1px);
+      top: 2rem;
+    }
+
+    .step {
+      width: 2rem;
+      height: 2rem;
+      font-size: 0.95rem;
+    }
+
+    .body {
+      padding-inline: 1rem;
+    }
+  }
+</style>
