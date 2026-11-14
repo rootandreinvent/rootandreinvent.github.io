@@ -1,0 +1,99 @@
+---
+import Card from "./Card.astro";
+import { url } from "../lib/url";
+
+interface Props {
+  numeral: string;
+  title: string;
+  href?: string;
+  linkLabel?: string;
+}
+
+const { numeral, title, href, linkLabel } = Astro.props;
+---
+
+<Card href={href} class="step-card">
+  <span class="numeral" aria-hidden="true">{numeral}</span>
+  <h3>
+    {
+      href ? (
+        <a class="stretched" href={url(href)}>
+          {title}
+        </a>
+      ) : (
+        title
+      )
+    }
+  </h3>
+  <p><slot /></p>
+  {href && linkLabel && <span class="more" aria-hidden="true">{linkLabel} &rarr;</span>}
+</Card>
+
+<style>
+  .numeral {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 999px;
+    border: 1.5px solid var(--color-gold-ink);
+    color: var(--color-gold-ink);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 1.1rem;
+  }
+
+  :global(.tone-band) .numeral {
+    background: var(--color-gold);
+    border-color: var(--color-gold);
+    color: var(--color-band);
+  }
+
+  h3 {
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  a.stretched {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  a.stretched::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-card);
+  }
+
+  a.stretched:focus-visible {
+    outline: none;
+  }
+
+  a.stretched:focus-visible::after {
+    outline: 3px solid var(--color-teal);
+    outline-offset: 3px;
+  }
+
+  :global(.tone-band) a.stretched:focus-visible::after {
+    outline-color: var(--color-gold);
+  }
+
+  .more {
+    display: inline-block;
+    margin-top: 1rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-teal);
+  }
+
+  :global(.tone-band) .more {
+    color: var(--color-gold);
+  }
+</style>

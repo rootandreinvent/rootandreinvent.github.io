@@ -1,0 +1,27 @@
+---
+import { site } from "../config/site";
+
+const { provider, siteId } = site.analytics;
+const domain = new URL(site.url).hostname;
+---
+
+{
+  provider === "plausible" && (
+    <script is:inline defer data-domain={siteId ?? domain} src="https://plausible.io/js/script.js" />
+  )
+}
+{
+  provider === "goatcounter" && siteId && (
+    <script is:inline async data-goatcounter={`https://${siteId}.goatcounter.com/count`} src="https://gc.zgo.at/count.js" />
+  )
+}
+{
+  provider === "cloudflare" && siteId && (
+    <script
+      is:inline
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon={JSON.stringify({ token: siteId })}
+    />
+  )
+}

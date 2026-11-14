@@ -1,0 +1,58 @@
+---
+import PlaceholderNote from "./PlaceholderNote.astro";
+import { showPending } from "../lib/placeholders";
+import type { Faq } from "../data/faq";
+
+interface Props {
+  items: Faq[];
+  title?: string;
+}
+
+const { items, title = "Frequently asked" } = Astro.props;
+const answered = items.filter((i) => i.a);
+const visible = showPending ? items : answered;
+---
+
+{
+  visible.length > 0 && (
+    <div class="faq">
+      <h2>{title}</h2>
+      {visible.map((item) => (
+        <details>
+          <summary>{item.q}</summary>
+          {item.a ? <p>{item.a}</p> : <PlaceholderNote text="[KELSEY TO ANSWER]" />}
+        </details>
+      ))}
+    </div>
+  )
+}
+
+<style>
+  .faq {
+    max-width: 760px;
+  }
+
+  details {
+    border-top: 1.5px solid var(--color-border);
+    padding: 0.25rem 0;
+  }
+
+  details:last-of-type {
+    border-bottom: 1.5px solid var(--color-border);
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    min-height: 56px;
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--color-heading);
+  }
+
+  details p {
+    margin: 0 0 1rem;
+  }
+</style>

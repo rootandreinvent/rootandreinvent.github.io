@@ -1,0 +1,41 @@
+---
+interface Props {
+  /** Text color: "green" for cream backgrounds, "cream" for green bands. */
+  variant?: "green" | "cream";
+  size?: "md" | "lg";
+}
+
+const { variant = "green", size = "md" } = Astro.props;
+---
+
+<span class:list={["wordmark", `wordmark-${variant}`, `wordmark-${size}`]}>
+  Root <span class="amp">&amp;</span> Reinvent
+</span>
+
+<style>
+  .wordmark {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    line-height: 1;
+  }
+  .wordmark-md {
+    font-size: 1.25rem;
+  }
+  .wordmark-lg {
+    font-size: 1.75rem;
+  }
+  .wordmark-green {
+    color: var(--color-heading);
+  }
+  .wordmark-green .amp {
+    color: var(--color-gold-ink);
+  }
+  .wordmark-cream {
+    color: var(--color-on-band-strong);
+  }
+  .wordmark-cream .amp {
+    color: var(--color-gold);
+  }
+</style>

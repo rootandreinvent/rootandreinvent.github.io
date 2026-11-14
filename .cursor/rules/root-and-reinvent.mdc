@@ -1,0 +1,16 @@
+---
+description: Root & Reinvent site rules
+alwaysApply: true
+---
+- Read docs/BUILD_BRIEF.md before making changes. It is the source of truth.
+- Use only copy from docs/BUILD_BRIEF.md and docs/root-and-reinvent-site-brief.md. Never invent copy, prices, stats, testimonials, logos or results. Use null data or <PlaceholderNote> for anything missing.
+- Never name a former employer, customer, competitor, product or city. Background = "enterprise technology sales" + job titles.
+- Meeting ask is always "15 to 20 minutes".
+- All colors and fonts come from src/styles/tokens.css. No hard-coded hex values in components.
+- All integrations read from src/config/site.ts. No hard-coded URLs for signup, booking, checkout or analytics.
+- No custom cart or payment forms. Checkout is hosted and goes through <BuyButton>.
+- Keep accessibility at WCAG 2.2 AA and Lighthouse 95+ mobile. Respect prefers-reduced-motion.
+- Prefer small, plain Astro components and vanilla TS. Don't add UI frameworks without asking.
+- docs/ and .banned-terms.local are gitignored and stay on this machine. The repo is public: never commit internal material (brag book, briefs, employer names).
+- Internal links go through `url()` from src/lib/url.ts so the GitHub Pages base path works.
+- Run `npm run build` before committing. It fails on leaked placeholders and banned terms.

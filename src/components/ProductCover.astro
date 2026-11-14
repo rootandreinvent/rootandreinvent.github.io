@@ -1,0 +1,82 @@
+---
+import { isPlaceholder } from "../lib/placeholders";
+
+interface Props {
+  title: string;
+  subtitle?: string;
+  size?: "card" | "hero";
+}
+
+const { title, subtitle, size = "card" } = Astro.props;
+const displayTitle = isPlaceholder(title) ? "Coming soon" : title;
+---
+
+<div class:list={["cover", `cover-${size}`]} role="img" aria-label={`${displayTitle} cover`}>
+  <span class="brand">Root <span class="amp">&amp;</span> Reinvent</span>
+  <span class="title">{displayTitle}</span>
+  {subtitle && !isPlaceholder(subtitle) && <span class="subtitle">{subtitle}</span>}
+  <span class="rule" aria-hidden="true"></span>
+</div>
+
+<style>
+  .cover {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    aspect-ratio: 4 / 3;
+    padding: 1.5rem;
+    border-radius: 12px;
+    overflow: hidden;
+    color: var(--color-on-band-strong);
+    background:
+      radial-gradient(70% 90% at 90% 0%, var(--color-teal) 0%, transparent 65%),
+      radial-gradient(30% 40% at 15% 20%, color-mix(in srgb, var(--color-gold) 35%, transparent) 0%, transparent 100%),
+      var(--color-band);
+  }
+
+  .cover-hero {
+    aspect-ratio: 4 / 5;
+    padding: 2rem;
+  }
+
+  .brand {
+    position: absolute;
+    top: 1.25rem;
+    left: 1.5rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--color-on-band);
+  }
+
+  .amp {
+    color: var(--color-gold);
+  }
+
+  .title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.5rem;
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+
+  .cover-hero .title {
+    font-size: clamp(1.9rem, 1.5rem + 1.5vw, 2.6rem);
+  }
+
+  .subtitle {
+    color: var(--color-on-band);
+    font-size: 0.95rem;
+  }
+
+  .rule {
+    width: 3rem;
+    height: 3px;
+    background: var(--color-gold);
+    border-radius: 2px;
+    margin-top: 0.5rem;
+  }
+</style>

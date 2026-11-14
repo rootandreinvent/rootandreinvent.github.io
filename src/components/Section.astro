@@ -1,0 +1,50 @@
+---
+interface Props {
+  tone?: "cream" | "band" | "bordered";
+  id?: string;
+  labelledby?: string;
+  class?: string;
+}
+
+const { tone = "cream", id, labelledby, class: className } = Astro.props;
+---
+
+<section
+  id={id}
+  aria-labelledby={labelledby}
+  class:list={["section", `tone-${tone}`, className]}
+>
+  <div class="container">
+    <slot />
+  </div>
+</section>
+
+<style>
+  .section {
+    padding-block: var(--space-section);
+  }
+
+  .tone-cream {
+    background: var(--color-bg);
+  }
+
+  .tone-bordered {
+    background: var(--color-bg);
+    border-block: 1.5px solid var(--color-border);
+  }
+
+  .tone-band {
+    background: var(--color-band);
+    color: var(--color-on-band);
+  }
+
+  .tone-band :global(h1),
+  .tone-band :global(h2),
+  .tone-band :global(h3) {
+    color: var(--color-on-band-strong);
+  }
+
+  .tone-band :global(a:not(.btn)) {
+    color: var(--color-on-band-strong);
+  }
+</style>

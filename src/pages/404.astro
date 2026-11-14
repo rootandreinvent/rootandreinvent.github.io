@@ -1,0 +1,33 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Section from "../components/Section.astro";
+import Button from "../components/Button.astro";
+---
+
+<BaseLayout title="Page not found" description="This page doesn't exist." noindex>
+  <Section tone="cream" labelledby="nf-title">
+    <div class="nf">
+      <p class="code" aria-hidden="true">404</p>
+      <h1 id="nf-title">This page doesn't exist.</h1>
+      <p class="lede">It may have moved, or the link may be wrong.</p>
+      <div class="button-row">
+        <Button href="/">Back to home</Button>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  .nf {
+    padding-block: 2rem;
+  }
+
+  .code {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(3.5rem, 3rem + 3vw, 5.5rem);
+    line-height: 1;
+    color: var(--color-gold-ink);
+    margin-bottom: 1rem;
+  }
+</style>

@@ -1,0 +1,25 @@
+---
+import Button from "./Button.astro";
+import { site } from "../config/site";
+
+interface Props {
+  variant?: "primary" | "secondary";
+  label?: string;
+  class?: string;
+}
+
+const { variant = "primary", label = "Book a 15 to 20 minute call", class: className } = Astro.props;
+const bookingUrl = site.booking.url;
+---
+
+{
+  bookingUrl ? (
+    <Button href={bookingUrl} external variant={variant} class={className}>
+      {label}
+    </Button>
+  ) : (
+    <Button href="/book/" variant={variant} class={className}>
+      {label}
+    </Button>
+  )
+}

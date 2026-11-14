@@ -1,0 +1,66 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Section from "../../components/Section.astro";
+import Eyebrow from "../../components/Eyebrow.astro";
+import SignupForm from "../../components/SignupForm.astro";
+import BrandVideo from "../../components/BrandVideo.astro";
+import PlaceholderNote from "../../components/PlaceholderNote.astro";
+---
+
+<BaseLayout
+  title="Free guide"
+  description="A free guide for new-logo sellers: why outreach fails before the first call, how to tier your accounts, and one thing to do today."
+  footerSignup={false}
+>
+  <Section tone="cream" labelledby="guide-title">
+    <div class="guide">
+      <div>
+        <Eyebrow>Free guide</Eyebrow>
+        <h1 id="guide-title">Why most AEs lose net-new logos, and the system that fixes it</h1>
+        <PlaceholderNote text="[Guide title pending: headline may change with the guide decision]" />
+        <p class="lede">A free short guide from a former sales leader who built and coached new-logo teams.</p>
+        <ul class="check-list">
+          <li>Why outreach fails before the first call</li>
+          <li>How to tier your accounts so you chase the right ones</li>
+          <li>One thing to do today</li>
+        </ul>
+        <SignupForm source="guide-page" />
+        <p class="fine-print">
+          One email now with your guide, then a short series on finding new deals. Unsubscribe anytime.
+        </p>
+      </div>
+      <div class="media">
+        <BrandVideo cut="teaser" />
+      </div>
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  .guide {
+    display: grid;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  @media (min-width: 1024px) {
+    .guide {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap: 4rem;
+    }
+
+    .media {
+      position: sticky;
+      top: 2rem;
+    }
+  }
+
+  h1 {
+    max-width: 20ch;
+  }
+
+  .fine-print {
+    margin-top: 1rem;
+    font-size: var(--step--1);
+  }
+</style>

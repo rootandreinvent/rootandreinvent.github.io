@@ -1,0 +1,145 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Section from "../components/Section.astro";
+import Eyebrow from "../components/Eyebrow.astro";
+import BookCallButton from "../components/BookCallButton.astro";
+import PlaceholderNote from "../components/PlaceholderNote.astro";
+import Faq from "../components/Faq.astro";
+import BrandVideo from "../components/BrandVideo.astro";
+import { getServices } from "../lib/content";
+import { isPlaceholder } from "../lib/placeholders";
+import { formatPrice } from "../lib/commerce";
+import { workWithMeFaq } from "../data/faq";
+
+const services = await getServices();
+---
+
+<BaseLayout
+  title="Work with me"
+  description="1:1 coaching, team workshops and fractional sales leadership for new-logo sales. Book a 15 to 20 minute call with Kelsey Dalton."
+>
+  <Section tone="band" labelledby="wwm-title">
+    <div class="intro">
+      <div>
+        <h1 id="wwm-title">Work with me</h1>
+        <p class="lede">
+          I've built new-logo teams, coached reps from their first email to their first big win, and run the cadences
+          that keep a team finding deals. Here's how I can help yours.
+        </p>
+        <div class="button-row">
+          <BookCallButton />
+        </div>
+      </div>
+      <BrandVideo cut="main" />
+    </div>
+  </Section>
+
+  {
+    services.map((service, i) => (
+      <Section tone={i % 2 === 0 ? "cream" : "bordered"} id={service.slug} labelledby={`${service.slug}-title`}>
+        <div class="service">
+          <div>
+            <Eyebrow>Service {i + 1} of {services.length}</Eyebrow>
+            <h2 id={`${service.slug}-title`}>{service.title}</h2>
+            <p class="lede">{service.summary}</p>
+          </div>
+          <dl class="details">
+            <div>
+              <dt>Who it's for</dt>
+              <dd>{service.audience}</dd>
+            </div>
+            <div>
+              <dt>What we work on</dt>
+              <dd>
+                <ul class="check-list">
+                  {service.workOn.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              </dd>
+            </div>
+            <div>
+              <dt>How it works</dt>
+              <dd>
+                {isPlaceholder(service.format) ? (
+                  <>
+                    Delivered virtually. <PlaceholderNote text={service.format} />
+                  </>
+                ) : (
+                  service.format
+                )}
+              </dd>
+            </div>
+            <div>
+              <dt>Investment</dt>
+              <dd>{service.price !== null ? formatPrice(service.price) : "Pricing on request"}</dd>
+            </div>
+          </dl>
+          <div class="cta">
+            <BookCallButton />
+          </div>
+        </div>
+      </Section>
+    ))
+  }
+
+  <Section tone="cream">
+    <Faq items={workWithMeFaq} />
+  </Section>
+</BaseLayout>
+
+<style>
+  .intro {
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  @media (min-width: 1024px) {
+    .intro {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 3.5rem;
+    }
+  }
+
+  .service {
+    display: grid;
+    gap: 2rem;
+  }
+
+  @media (min-width: 900px) {
+    .service {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+      column-gap: 4rem;
+    }
+
+    .cta {
+      grid-column: 2;
+    }
+  }
+
+  .details {
+    margin: 0;
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  dt {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.8125rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-teal);
+    margin-bottom: 0.4rem;
+  }
+
+  dd {
+    margin: 0;
+    color: var(--color-heading);
+  }
+
+  dd .check-list {
+    margin: 0;
+  }
+</style>

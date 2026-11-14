@@ -1,0 +1,165 @@
+---
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Section from "../../components/Section.astro";
+import Eyebrow from "../../components/Eyebrow.astro";
+import ProductCover from "../../components/ProductCover.astro";
+import BuyButton from "../../components/BuyButton.astro";
+import SignupForm from "../../components/SignupForm.astro";
+import PlaceholderNote from "../../components/PlaceholderNote.astro";
+import Faq from "../../components/Faq.astro";
+import { getProducts } from "../../lib/content";
+import { canCheckout, formatPrice } from "../../lib/commerce";
+import { isPlaceholder, showPending } from "../../lib/placeholders";
+import { productLd } from "../../lib/jsonld";
+
+export const getStaticPaths = (async () => {
+  const products = await getProducts();
+  return products.map((product) => ({ params: { slug: product.slug }, props: { product } }));
+}) satisfies GetStaticPaths;
+
+const { product } = Astro.props;
+const live = canCheckout(product);
+const status = !live || product.status === "coming-soon" ? "Coming soon" : product.status === "preorder" ? "Pre-order" : null;
+const priceLabel = product.price !== null ? formatPrice(product.price) : "Price coming soon";
+const title = isPlaceholder(product.title) ? "Future product" : product.title;
+const jsonLd =
+  live && product.status === "available" && product.price !== null && product.checkoutUrl
+    ? productLd({ ...product, price: product.price, checkoutUrl: product.checkoutUrl }, Astro.site)
+    : undefined;
+---
+
+<BaseLayout
+  title={title}
+  description={isPlaceholder(product.summary) ? `${title} from Root & Reinvent.` : product.summary}
+  footerSignup={false}
+  jsonLd={jsonLd}
+>
+  <Section tone="cream" labelledby="product-title">
+    <div class="product-hero">
+      <ProductCover title={product.title} subtitle={product.subtitle} size="hero" />
+      <div>
+        {status && <Eyebrow>{status}</Eyebrow>}
+        <h1 id="product-title">
+          {isPlaceholder(product.title) ? <PlaceholderNote text={product.title} /> : product.title}
+        </h1>
+        {!isPlaceholder(product.subtitle) && <p class="subtitle">{product.subtitle}</p>}
+        <p class="price">{priceLabel}</p>
+        <BuyButton product={product} waitlistHref="#waitlist" />
+
+        {
+          product.includes.length > 0 && (
+            <>
+              <h2 class="small-heading">What's included</h2>
+              <ul class="check-list">
+                {product.includes.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </>
+          )
+        }
+      </div>
+    </div>
+  </Section>
+
+  {
+    product.sections.length > 0 && (
+      <Section tone="bordered" labelledby="inside-title">
+        <h2 id="inside-title">What's inside</h2>
+        <ol class="sections">
+          {product.sections.map((section) => (
+            <li>{section}</li>
+          ))}
+        </ol>
+      </Section>
+    )
+  }
+
+  <Section tone="cream" labelledby="for-title">
+    <h2 id="for-title">Who it's for</h2>
+    {isPlaceholder(product.audience) ? <PlaceholderNote text={product.audience} /> : <p class="lede">{product.audience}.</p>}
+
+    <div class="faq-wrap">
+      <Faq items={product.faq.length ? product.faq : showPending ? [{ q: "[FAQ: KELSEY TO WRITE]", a: null }] : []} />
+    </div>
+
+    {product.guarantee && <p class="guarantee">{product.guarantee}</p>}
+    {!product.guarantee && <PlaceholderNote text="[Pending: guarantee and refund terms not set]" />}
+  </Section>
+
+  <Section tone="band" labelledby="waitlist-title" id="waitlist">
+    <div class="waitlist">
+      <h2 id="waitlist-title">Join the waitlist.</h2>
+      <p class="lede">One email when it's ready.</p>
+      <SignupForm
+        source={`product-${product.slug}`}
+        tag={`waitlist-${product.slug}`}
+        buttonLabel="Join the waitlist"
+      />
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  .product-hero {
+    display: grid;
+    gap: 2.5rem;
+    align-items: start;
+  }
+
+  @media (min-width: 900px) {
+    .product-hero {
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 4rem;
+    }
+  }
+
+  .product-hero :global(.cover) {
+    max-width: 440px;
+  }
+
+  .subtitle {
+    font-size: var(--step-1);
+    margin-bottom: 0.5rem;
+  }
+
+  .price {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: 1.25rem;
+  }
+
+  .small-heading {
+    font-size: var(--step-1);
+    margin-top: 2.25rem;
+  }
+
+  .sections {
+    margin: 1.5rem 0 0;
+    padding-left: 1.4rem;
+    display: grid;
+    gap: 0.75rem;
+    max-width: var(--measure);
+    color: var(--color-heading);
+  }
+
+  .sections li::marker {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--color-gold-ink);
+  }
+
+  .faq-wrap {
+    margin-top: 2.5rem;
+  }
+
+  .guarantee {
+    margin-top: 2rem;
+  }
+
+  .waitlist {
+    max-width: 720px;
+  }
+</style>

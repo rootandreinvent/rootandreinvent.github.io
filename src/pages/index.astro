@@ -1,0 +1,202 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Section from "../components/Section.astro";
+import Eyebrow from "../components/Eyebrow.astro";
+import Button from "../components/Button.astro";
+import BookCallButton from "../components/BookCallButton.astro";
+import StepCard from "../components/StepCard.astro";
+import StatPanel from "../components/StatPanel.astro";
+import EmailAnatomy from "../components/EmailAnatomy.astro";
+import ServiceCard from "../components/ServiceCard.astro";
+import ProductCard from "../components/ProductCard.astro";
+import SignupForm from "../components/SignupForm.astro";
+import BrandVideo from "../components/BrandVideo.astro";
+import HeroLoop from "../components/HeroLoop.astro";
+import PlaceholderNote from "../components/PlaceholderNote.astro";
+import { getServices, getProducts, getMethodPosts, methodPillars } from "../lib/content";
+import { organizationLd, personLd } from "../lib/jsonld";
+
+const services = await getServices();
+const products = await getProducts();
+const playbook = products.find((p) => p.slug === "repeat-success-playbook");
+const published = new Set((await getMethodPosts()).map((p) => p.data.slug));
+---
+
+<BaseLayout
+  description="New-logo sales consulting from Kelsey Dalton. A repeatable method for sales reps, managers and founders: researched outreach, real proof and a small ask."
+  footerSignup={false}
+  jsonLd={[organizationLd(Astro.site), personLd(Astro.site)]}
+>
+  <section class="hero tone-band" aria-labelledby="hero-title">
+    <HeroLoop />
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <Eyebrow>New-logo sales consulting</Eyebrow>
+        <h1 id="hero-title">Closing deals takes finding deals.</h1>
+        <p class="lede">
+          I help sales reps, managers and founders land new logos with a repeatable method: researched outreach, real
+          proof and a small ask.
+        </p>
+        <div class="button-row">
+          <BookCallButton />
+          <Button href="/guide/" variant="secondary">Get the free guide</Button>
+        </div>
+      </div>
+      <div class="hero-media">
+        <BrandVideo cut="main" />
+      </div>
+    </div>
+  </section>
+
+  <Section tone="cream" labelledby="problem-title">
+    <Eyebrow>The problem</Eyebrow>
+    <h2 id="problem-title">Most prospecting emails get ignored.</h2>
+    <p class="lede">They talk about the product and the seller. What gets a reply is a short note that does three things.</p>
+    <div class="grid grid-3 cards" data-reveal>
+      <StepCard numeral="1" title="Shows you did your homework.">
+        One specific reason you're writing to this person.
+      </StepCard>
+      <StepCard numeral="2" title="Proves you've helped a company like theirs.">
+        A similar customer, a real challenge and a measurable result.
+      </StepCard>
+      <StepCard numeral="3" title="Asks for a small next step.">15 to 20 minutes, nothing bigger.</StepCard>
+    </div>
+  </Section>
+
+  <Section tone="band" labelledby="method-title">
+    <Eyebrow>The Repeat Success Method</Eyebrow>
+    <h2 id="method-title">A repeatable way to land new logos.</h2>
+    <div class="grid grid-4 cards" data-reveal>
+      {
+        methodPillars.map((p) => (
+          <StepCard
+            numeral={p.numeral}
+            title={p.title}
+            href={published.has(p.slug) ? `/method/${p.slug}/` : undefined}
+            linkLabel="Read more"
+          >
+            {p.body}
+          </StepCard>
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section tone="cream" labelledby="email-title">
+    <Eyebrow>An invitation, not a pitch</Eyebrow>
+    <h2 id="email-title">Every first email has three parts. Nothing else.</h2>
+    <EmailAnatomy />
+  </Section>
+
+  <Section tone="band" labelledby="track-title">
+    <Eyebrow>Track record</Eyebrow>
+    <h2 id="track-title">Built and led new-logo teams for 10+ years.</h2>
+    <StatPanel />
+    <p class="titles">
+      From BDR to Regional Sales Director and Regional Vice President.
+      <PlaceholderNote text="[KELSEY TO CONFIRM titles and order]" />
+    </p>
+  </Section>
+
+  <Section tone="cream" labelledby="help-title">
+    <Eyebrow>Work with me</Eyebrow>
+    <h2 id="help-title">Three ways to work together.</h2>
+    <div class="grid grid-3 cards" data-reveal>
+      {services.map((service) => <ServiceCard service={service} />)}
+    </div>
+  </Section>
+
+  {
+    playbook && (
+      <Section tone="bordered" labelledby="playbook-title">
+        <div class="teaser">
+          <div>
+            <Eyebrow>The playbook</Eyebrow>
+            <h2 id="playbook-title">The Repeat Success Method, in one playbook.</h2>
+            <p>
+              The full method: who to call, your library of proof, the outreach cadence, running the first meeting, and
+              AI prompts for every step. Includes an editable account-scoring toolkit and a guide for managers.
+            </p>
+          </div>
+          <div class="teaser-card">
+            <ProductCard product={playbook} />
+          </div>
+        </div>
+      </Section>
+    )
+  }
+
+  <Section tone="band" labelledby="guide-title" id="free-guide">
+    <div class="guide">
+      <h2 id="guide-title">Get the free guide.</h2>
+      <p class="lede">
+        A template and three AI prompts that get replies. From a former sales leader who built and coached new-logo
+        teams.
+        <PlaceholderNote text="[Guide title pending: Kelsey is choosing between the email template guide and the 4-tier account guide]" />
+      </p>
+      <SignupForm source="home-footer" />
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    color: var(--color-on-band);
+    padding-block: clamp(3.5rem, 2.5rem + 5vw, 6.5rem);
+    overflow: hidden;
+  }
+
+  .hero h1 {
+    color: var(--color-on-band-strong);
+    max-width: 18ch;
+  }
+
+  .hero-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  @media (min-width: 1024px) {
+    .hero-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 3.5rem;
+    }
+  }
+
+  .cards {
+    margin-top: 2.5rem;
+  }
+
+  .titles {
+    margin-top: 2rem;
+    font-size: var(--step-1);
+    color: var(--color-on-band-strong);
+  }
+
+  .teaser {
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  @media (min-width: 900px) {
+    .teaser {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 4rem;
+    }
+  }
+
+  .teaser-card {
+    max-width: 420px;
+    width: 100%;
+  }
+
+  .guide {
+    max-width: 720px;
+  }
+</style>

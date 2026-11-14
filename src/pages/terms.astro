@@ -1,0 +1,28 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Section from "../components/Section.astro";
+import PlaceholderNote from "../components/PlaceholderNote.astro";
+import { site } from "../config/site";
+---
+
+<BaseLayout
+  title="Terms"
+  description="Terms of sale for Root & Reinvent."
+  noindex
+  draftBanner="Draft. Needs Kelsey's review before launch."
+>
+  <Section tone="cream" labelledby="terms-title">
+    <div class="legal">
+      <h1 id="terms-title">Terms</h1>
+      <p class="lede">Nothing is on sale yet. Terms of sale will be published here before any product goes on sale.</p>
+      <PlaceholderNote text="[Pending: terms of sale, refund policy and digital delivery terms not set]" />
+      <p>Questions in the meantime: {site.email.hello}.</p>
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  .legal {
+    max-width: calc(var(--measure) + 2rem);
+  }
+</style>

@@ -1,0 +1,255 @@
+---
+import Wordmark from "./Wordmark.astro";
+import BookCallButton from "./BookCallButton.astro";
+import { url } from "../lib/url";
+
+const nav = [
+  { href: "/work-with-me/", label: "Work with me" },
+  { href: "/method/", label: "Method" },
+  { href: "/shop/", label: "Shop" },
+  { href: "/about/", label: "About" },
+];
+
+const current = Astro.url.pathname;
+const isCurrent = (href: string) => current.startsWith(url(href));
+---
+
+<header class="site-header">
+  <div class="container bar">
+    <a class="brand" href={url("/")} aria-label="Root & Reinvent home">
+      <Wordmark variant="green" />
+    </a>
+
+    <nav class="nav" aria-label="Main">
+      <button
+        class="menu-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="primary-nav"
+        data-menu-toggle
+      >
+        <span class="menu-icon" aria-hidden="true"></span>
+        <span class="menu-label">Menu</span>
+      </button>
+      <ul id="primary-nav" class="nav-list" role="list" data-menu>
+        {
+          nav.map((item) => (
+            <li>
+              <a href={url(item.href)} aria-current={isCurrent(item.href) ? "page" : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <BookCallButton label="Book a call" class="header-book" />
+  </div>
+</header>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>("[data-menu-toggle]");
+  const menu = document.querySelector<HTMLElement>("[data-menu]");
+
+  if (toggle && menu) {
+    const setOpen = (open: boolean) => {
+      toggle.setAttribute("aria-expanded", String(open));
+      menu.classList.toggle("is-open", open);
+    };
+
+    toggle.addEventListener("click", () => {
+      setOpen(toggle.getAttribute("aria-expanded") !== "true");
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && toggle.getAttribute("aria-expanded") === "true") {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+  }
+</script>
+
+<style>
+  .site-header {
+    position: relative;
+    z-index: 20;
+    background: var(--color-bg);
+    border-bottom: 1.5px solid var(--color-border);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-height: 72px;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    text-decoration: none;
+    margin-right: auto;
+  }
+
+  .nav {
+    order: 3;
+  }
+
+  .menu-toggle {
+    display: none;
+  }
+
+  .nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .nav-list a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 0.75rem;
+    color: var(--color-heading);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.98rem;
+    text-decoration: none;
+    border-radius: 8px;
+  }
+
+  .nav-list a:hover {
+    background: color-mix(in srgb, var(--color-heading) 6%, transparent);
+  }
+
+  .nav-list a[aria-current="page"] {
+    text-decoration: underline;
+    text-decoration-color: var(--color-gold-ink);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.4em;
+  }
+
+  .bar :global(.header-book) {
+    order: 4;
+    min-height: 44px;
+    padding: 0.55rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  @media (min-width: 900px) {
+    .nav {
+      order: 2;
+      margin-right: 0.5rem;
+    }
+  }
+
+  /* Mobile: only collapse the menu when JS can open it again. */
+  @media (max-width: 899px) {
+    .bar {
+      gap: 0.5rem;
+    }
+
+    :global(html:not(.js)) .bar {
+      flex-wrap: wrap;
+    }
+
+    .nav {
+      order: 3;
+    }
+
+    .bar :global(.header-book) {
+      padding: 0.5rem 0.8rem;
+      font-size: 0.9rem;
+    }
+
+    :global(.js) .menu-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-height: 44px;
+      min-width: 44px;
+      padding: 0 0.6rem;
+      background: none;
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-button);
+      color: var(--color-heading);
+      font-family: var(--font-display);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .menu-icon,
+    .menu-icon::before,
+    .menu-icon::after {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: currentColor;
+      border-radius: 2px;
+      position: relative;
+    }
+
+    .menu-icon::before,
+    .menu-icon::after {
+      content: "";
+      position: absolute;
+      left: 0;
+    }
+
+    .menu-icon::before {
+      top: -6px;
+    }
+
+    .menu-icon::after {
+      top: 6px;
+    }
+
+    .nav-list {
+      flex-wrap: wrap;
+    }
+
+    :global(.js) .nav-list {
+      display: none;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+      flex-direction: column;
+      gap: 0;
+      padding: 0.5rem var(--gutter) 1rem;
+      background: var(--color-bg);
+      border-bottom: 1.5px solid var(--color-border);
+      box-shadow: 0 12px 24px -16px rgb(23 52 46 / 0.4);
+    }
+
+    :global(.js) .nav-list.is-open {
+      display: flex;
+    }
+
+    :global(.js) .nav-list a {
+      width: 100%;
+      min-height: 48px;
+    }
+
+    /* No-JS fallback: links wrap onto their own row under the wordmark. */
+    :global(html:not(.js)) .nav {
+      order: 5;
+      flex-basis: 100%;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .menu-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+  }
+</style>

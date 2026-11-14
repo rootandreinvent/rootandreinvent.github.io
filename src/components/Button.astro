@@ -1,0 +1,103 @@
+---
+import { url } from "../lib/url";
+
+interface Props {
+  href?: string;
+  variant?: "primary" | "secondary";
+  type?: "button" | "submit";
+  disabled?: boolean;
+  external?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  href,
+  variant = "primary",
+  type = "button",
+  disabled = false,
+  external = false,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const classes = ["btn", `btn-${variant}`, className];
+const resolvedHref = href && !external ? url(href) : href;
+---
+
+{
+  href && !disabled ? (
+    <a
+      class:list={classes}
+      href={resolvedHref}
+      {...(external ? { rel: "noopener", target: "_blank" } : {})}
+      {...rest}
+    >
+      <slot />
+    </a>
+  ) : (
+    <button class:list={classes} type={type} disabled={disabled} {...rest}>
+      <slot />
+    </button>
+  )
+}
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 48px;
+    padding: 0.75rem 1.35rem;
+    border-radius: var(--radius-button);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .btn-primary {
+    background: var(--color-gold);
+    color: var(--color-band);
+    border-color: var(--color-gold);
+  }
+
+  .btn-primary:hover {
+    background: var(--color-gold-hover);
+    border-color: var(--color-gold-hover);
+    text-decoration: none;
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--color-heading);
+    border-color: var(--color-heading);
+  }
+
+  .btn-secondary:hover {
+    background: color-mix(in srgb, var(--color-heading) 6%, transparent);
+    text-decoration: none;
+  }
+
+  :global(.tone-band) .btn-secondary,
+  :global(.site-footer) .btn-secondary {
+    color: var(--color-on-band-strong);
+    border-color: var(--color-on-band-strong);
+  }
+
+  :global(.tone-band) .btn-secondary:hover,
+  :global(.site-footer) .btn-secondary:hover {
+    background: color-mix(in srgb, var(--color-on-band-strong) 8%, transparent);
+  }
+
+  .btn[disabled] {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+</style>

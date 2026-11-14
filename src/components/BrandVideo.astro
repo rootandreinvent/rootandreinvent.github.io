@@ -1,0 +1,163 @@
+---
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import { url } from "../lib/url";
+
+interface Props {
+  cut?: "main" | "teaser";
+  /** Override the media path, e.g. when files move to a video host. */
+  src?: string;
+}
+
+const { cut = "main", src } = Astro.props;
+
+const cuts = {
+  main: { file: "brand-main", label: "Watch: 78 seconds", title: "Root & Reinvent brand video" },
+  teaser: { file: "brand-teaser", label: "Watch: 30 seconds", title: "Root & Reinvent teaser video" },
+} as const;
+
+const meta = cuts[cut];
+const videoDir = join(process.cwd(), "public", "video");
+const has = (name: string) => existsSync(join(videoDir, name));
+
+const base = src ?? url(`/video/${meta.file}`);
+const hasMp4 = Boolean(src) || has(`${meta.file}.mp4`);
+const hasWebm = !src && has(`${meta.file}.webm`);
+const hasCaptions = has(`${meta.file}.en.vtt`);
+const hasPoster = has("poster.jpg");
+const ready = hasMp4;
+---
+
+<div class="brand-video" data-brand-video>
+  {
+    ready ? (
+      <div class="frame">
+        <video
+          controls
+          preload="none"
+          playsinline
+          poster={hasPoster ? url("/video/poster.jpg") : undefined}
+          aria-label={meta.title}
+        >
+          {hasWebm && <source src={`${base}.webm`} type="video/webm" />}
+          <source src={src ?? `${base}.mp4`} type="video/mp4" />
+          {hasCaptions && (
+            <track kind="captions" src={url(`/video/${meta.file}.en.vtt`)} srclang="en" label="English" default />
+          )}
+        </video>
+        <button type="button" class="play" hidden data-play>
+          <span class="play-icon" aria-hidden="true" />
+          <span>{meta.label}</span>
+        </button>
+      </div>
+    ) : (
+      <div class="frame placeholder" role="img" aria-label="Brand video coming soon">
+        <span class="play-icon" aria-hidden="true" />
+        <span class="soon">Video coming soon</span>
+      </div>
+    )
+  }
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-brand-video]").forEach((root) => {
+    const video = root.querySelector("video");
+    const play = root.querySelector<HTMLButtonElement>("[data-play]");
+    if (!video || !play) return;
+
+    // Without JS the native controls work on their own; with JS we add a large play button.
+    play.hidden = false;
+    video.controls = false;
+
+    play.addEventListener("click", () => {
+      play.hidden = true;
+      video.controls = true;
+      video.muted = false;
+      void video.play();
+      video.focus();
+    });
+  });
+</script>
+
+<style>
+  .brand-video {
+    width: 100%;
+  }
+
+  .frame {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    background:
+      radial-gradient(60% 80% at 20% 30%, var(--color-teal) 0%, transparent 60%),
+      radial-gradient(50% 60% at 85% 75%, var(--color-band-raised) 0%, transparent 70%),
+      radial-gradient(18% 22% at 70% 25%, color-mix(in srgb, var(--color-gold) 55%, transparent) 0%, transparent 100%),
+      var(--color-band);
+    border: 1.5px solid var(--color-band-border);
+  }
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .play,
+  .placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+    color: var(--color-on-band-strong);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+  }
+
+  .play {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    border: 0;
+    background: rgb(23 52 46 / 0.35);
+    cursor: pointer;
+  }
+
+  .play[hidden] {
+    display: none;
+  }
+
+  .play:focus-visible {
+    outline: 3px solid var(--color-gold);
+    outline-offset: -6px;
+  }
+
+  .play-icon {
+    width: 4.25rem;
+    height: 4.25rem;
+    border-radius: 999px;
+    background: var(--color-gold);
+    position: relative;
+  }
+
+  .play-icon::after {
+    content: "";
+    position: absolute;
+    left: 54%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-style: solid;
+    border-width: 0.7rem 0 0.7rem 1.15rem;
+    border-color: transparent transparent transparent var(--color-band);
+  }
+
+  .placeholder .play-icon {
+    opacity: 0.5;
+  }
+
+  .soon {
+    color: var(--color-on-band);
+  }
+</style>

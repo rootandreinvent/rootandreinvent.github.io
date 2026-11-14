@@ -1,0 +1,131 @@
+---
+import type { GetStaticPaths } from "astro";
+import { render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Section from "../../components/Section.astro";
+import Eyebrow from "../../components/Eyebrow.astro";
+import Callout from "../../components/Callout.astro";
+import SignupForm from "../../components/SignupForm.astro";
+import PlaceholderNote from "../../components/PlaceholderNote.astro";
+import { getMethodPosts } from "../../lib/content";
+import { url } from "../../lib/url";
+
+export const getStaticPaths = (async () => {
+  const posts = await getMethodPosts();
+  return posts.map((post) => ({ params: { slug: post.data.slug }, props: { post } }));
+}) satisfies GetStaticPaths;
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const { data } = post;
+---
+
+<BaseLayout
+  title={data.title}
+  description={data.description}
+  footerSignup={false}
+  draftBanner={data.draft ? "Draft. Needs Kelsey's review before it publishes." : undefined}
+>
+  <article>
+    <Section tone="cream" labelledby="post-title">
+      <div class="post">
+        <a class="back" href={url("/method/")}>&larr; The Repeat Success Method</a>
+        <Eyebrow>{data.numeral} · {data.pillar}</Eyebrow>
+        <h1 id="post-title">{data.title}</h1>
+        {data.draft && <PlaceholderNote text="[KELSEY TO REVIEW: draft post]" />}
+        <p class="lede">{data.lede}</p>
+        <div class="prose">
+          <Content />
+        </div>
+        {
+          data.mentionsAI && (
+            <Callout>
+              <p>
+                Keep customers' names, contact details, pricing and deal values out of any AI tool. Use an
+                employer-approved tool and paraphrase anything from your CRM. Check every fact AI gives you.
+              </p>
+            </Callout>
+          )
+        }
+      </div>
+    </Section>
+  </article>
+
+  <Section tone="band" labelledby="signup-title">
+    <div class="signup">
+      <h2 id="signup-title">Get the free guide.</h2>
+      <p class="lede">A template and three AI prompts that get replies.</p>
+      <SignupForm source={`method-${data.slug}`} />
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  .post {
+    max-width: calc(var(--measure) + 2rem);
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-bottom: 1.5rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .prose {
+    margin-top: 2rem;
+    color: var(--color-body);
+  }
+
+  .prose :global(h2) {
+    font-size: var(--step-2);
+    margin-top: 2.5rem;
+  }
+
+  .prose :global(h3) {
+    margin-top: 2rem;
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    max-width: var(--measure);
+    padding-left: 1.3rem;
+    margin: 0 0 1.25rem;
+  }
+
+  .prose :global(li) {
+    margin-bottom: 0.4rem;
+  }
+
+  .prose :global(li::marker) {
+    color: var(--color-gold-ink);
+    font-weight: 700;
+  }
+
+  .prose :global(strong) {
+    color: var(--color-heading);
+  }
+
+  .prose :global(blockquote) {
+    margin: 2rem 0;
+    padding: 0.25rem 0 0.25rem 1.5rem;
+    border-left: 4px solid var(--color-gold);
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--color-heading);
+    max-width: var(--measure);
+  }
+
+  .prose :global(blockquote p) {
+    margin: 0;
+  }
+
+  .signup {
+    max-width: 720px;
+  }
+</style>

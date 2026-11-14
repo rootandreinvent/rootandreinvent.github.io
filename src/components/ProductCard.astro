@@ -1,0 +1,92 @@
+---
+import Card from "./Card.astro";
+import ProductCover from "./ProductCover.astro";
+import BuyButton from "./BuyButton.astro";
+import PlaceholderNote from "./PlaceholderNote.astro";
+import { formatPrice, canCheckout } from "../lib/commerce";
+import { isPlaceholder } from "../lib/placeholders";
+import { url } from "../lib/url";
+
+type Product = {
+  title: string;
+  slug: string;
+  subtitle: string;
+  summary: string;
+  status: "coming-soon" | "preorder" | "available" | "service";
+  price: number | null;
+  checkoutUrl: string | null;
+};
+
+interface Props {
+  product: Product;
+  headingLevel?: "h2" | "h3";
+}
+
+const { product, headingLevel: Heading = "h3" } = Astro.props;
+const live = canCheckout(product);
+const badge = !live || product.status === "coming-soon" ? "Coming soon" : product.status === "preorder" ? "Pre-order" : null;
+const priceLabel = product.price !== null ? formatPrice(product.price) : "Price coming soon";
+const pending = isPlaceholder(product.title);
+---
+
+<Card tag="article" class="product-card">
+  <ProductCover title={product.title} subtitle={product.subtitle} />
+  <div class="meta">
+    {badge && <span class="badge">{badge}</span>}
+    <span class="price">{priceLabel}</span>
+  </div>
+  <Heading class="title">
+    {pending ? <PlaceholderNote text={product.title} /> : <a href={url(`/shop/${product.slug}/`)}>{product.title}</a>}
+  </Heading>
+  {isPlaceholder(product.summary) ? <PlaceholderNote text={product.summary} /> : <p>{product.summary}</p>}
+  <div class="actions">
+    <BuyButton product={product} />
+  </div>
+</Card>
+
+<style>
+  .meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin: 1.1rem 0 0.6rem;
+  }
+
+  .badge {
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-band);
+    background: var(--hl-reason);
+    border-radius: 999px;
+    padding: 0.3rem 0.7rem;
+  }
+
+  .price {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-body);
+  }
+
+  .title {
+    font-size: var(--step-1);
+    margin-bottom: 0.4rem;
+  }
+
+  .title a {
+    color: var(--color-heading);
+    text-decoration: none;
+  }
+
+  .title a:hover {
+    text-decoration: underline;
+  }
+
+  .actions {
+    margin-top: 1.25rem;
+  }
+</style>

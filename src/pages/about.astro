@@ -1,0 +1,129 @@
+---
+import { Image } from "astro:assets";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Section from "../components/Section.astro";
+import Eyebrow from "../components/Eyebrow.astro";
+import StepCard from "../components/StepCard.astro";
+import StatPanel from "../components/StatPanel.astro";
+import BookCallButton from "../components/BookCallButton.astro";
+import BrandVideo from "../components/BrandVideo.astro";
+import PlaceholderNote from "../components/PlaceholderNote.astro";
+import { personLd } from "../lib/jsonld";
+import portrait from "../assets/kelsey-interim.jpg";
+---
+
+<BaseLayout
+  title="About Kelsey"
+  description="Kelsey Dalton spent more than ten years in enterprise technology sales and led net-new-logo teams. Now she teaches the Repeat Success Method."
+  jsonLd={personLd(Astro.site)}
+>
+  <Section tone="cream" labelledby="about-title">
+    <div class="about">
+      <figure class="portrait">
+        <Image
+          src={portrait}
+          alt="Kelsey Dalton, founder of Root & Reinvent"
+          widths={[328, 656]}
+          sizes="(min-width: 900px) 328px, 80vw"
+          loading="eager"
+        />
+        <PlaceholderNote text="[TODO: professional headshot; this is a low-resolution interim crop]" />
+      </figure>
+      <div>
+        <Eyebrow>About</Eyebrow>
+        <h1 id="about-title">About Kelsey</h1>
+        <p class="lede">
+          I spent more than ten years in enterprise technology sales. I started as a BDR, moved into account executive
+          roles, then led net-new-logo teams as a Regional Sales Director and a Regional Vice President.
+        </p>
+        <p>
+          Landing new logos was the job. I built a repeatable way to do it, and now I teach it through coaching,
+          workshops and the Repeat Success Method.
+        </p>
+        <PlaceholderNote text="[KELSEY TO CONFIRM bio wording and titles]" />
+        <div class="button-row">
+          <BookCallButton />
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <Section tone="band" labelledby="record-title">
+    <Eyebrow>Track record</Eyebrow>
+    <h2 id="record-title">Built and led new-logo teams for 10+ years.</h2>
+    <StatPanel />
+  </Section>
+
+  <Section tone="cream" labelledby="how-title">
+    <Eyebrow>How I work</Eyebrow>
+    <h2 id="how-title">Three principles.</h2>
+    <div class="grid grid-3 cards">
+      <StepCard numeral="1" title="An invitation, not a pitch.">
+        You are not asking them to buy. You are asking whether a conversation is worth their time.
+      </StepCard>
+      <StepCard numeral="2" title="Never invent a number.">
+        Use only results you're approved to share. Don't round up.
+      </StepCard>
+      <StepCard numeral="3" title="Small asks, real proof.">
+        A similar customer, a real challenge, a measurable result, and a 15 to 20 minute ask.
+      </StepCard>
+    </div>
+  </Section>
+
+  <Section tone="bordered" labelledby="video-title">
+    <div class="video">
+      <div>
+        <h2 id="video-title">The Repeat Success Method, in 78 seconds.</h2>
+        <div class="button-row">
+          <BookCallButton />
+        </div>
+      </div>
+      <BrandVideo cut="main" />
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  .about {
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  @media (min-width: 900px) {
+    .about {
+      grid-template-columns: 328px minmax(0, 1fr);
+      gap: 4rem;
+    }
+  }
+
+  .portrait {
+    margin: 0;
+    max-width: 328px;
+  }
+
+  .portrait :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: var(--radius-card);
+    border: 1.5px solid var(--color-border);
+  }
+
+  .cards {
+    margin-top: 2.5rem;
+  }
+
+  .video {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  @media (min-width: 900px) {
+    .video {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: 4rem;
+    }
+  }
+</style>

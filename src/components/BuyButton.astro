@@ -1,0 +1,32 @@
+---
+import Button from "./Button.astro";
+import BookCallButton from "./BookCallButton.astro";
+import { checkoutHref, formatPrice, type Purchasable } from "../lib/commerce";
+
+interface Props {
+  product: Purchasable;
+  /** Where "Join the waitlist" points. Defaults to the product page's waitlist form. */
+  waitlistHref?: string;
+  variant?: "primary" | "secondary";
+}
+
+const { product, waitlistHref = `/shop/${product.slug}/#waitlist`, variant = "primary" } = Astro.props;
+
+const href = checkoutHref(product);
+let mode: "book" | "waitlist" | "preorder" | "buy" = "waitlist";
+
+if (product.status === "service") mode = "book";
+else if (href && product.status === "preorder") mode = "preorder";
+else if (href && product.status === "available" && product.price !== null) mode = "buy";
+---
+
+{mode === "book" && <BookCallButton variant={variant} label="Book a call" />}
+{mode === "waitlist" && <Button href={waitlistHref} variant={variant}>Join the waitlist</Button>}
+{mode === "preorder" && href && <Button href={href} external variant={variant}>Pre-order</Button>}
+{
+  mode === "buy" && href && product.price !== null && (
+    <Button href={href} external variant={variant}>
+      Buy now: {formatPrice(product.price)}
+    </Button>
+  )
+}

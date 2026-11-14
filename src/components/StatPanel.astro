@@ -1,0 +1,62 @@
+---
+import { stats } from "../data/stats";
+import { showPending } from "../lib/placeholders";
+import PlaceholderNote from "./PlaceholderNote.astro";
+
+const visible = stats.filter((s) => s.approved || showPending);
+---
+
+<ul class="stats" role="list">
+  {
+    visible.map((stat) => (
+      <li class:list={["stat", { pending: !stat.approved }]}>
+        <span class:list={["value", { long: stat.value.length > 4 }]}>{stat.value}</span>
+        {stat.label && <span class="label">{stat.label}</span>}
+        {!stat.approved && <PlaceholderNote text="[KELSEY TO CONFIRM]" />}
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .stats {
+    list-style: none;
+    margin: 2.5rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1.5rem;
+    border-radius: var(--radius-card);
+    background: var(--color-band-raised);
+    border: 1.5px solid var(--color-band-border);
+  }
+
+  .stat.pending {
+    border-style: dashed;
+  }
+
+  .value {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+    line-height: 1;
+    color: var(--color-gold);
+  }
+
+  .value.long {
+    font-size: clamp(1.5rem, 1.3rem + 0.8vw, 1.9rem);
+    line-height: 1.15;
+  }
+
+  .label {
+    color: var(--color-on-band);
+    font-size: 1rem;
+  }
+</style>

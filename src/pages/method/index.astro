@@ -1,0 +1,68 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Section from "../../components/Section.astro";
+import Eyebrow from "../../components/Eyebrow.astro";
+import StepCard from "../../components/StepCard.astro";
+import EmailAnatomy from "../../components/EmailAnatomy.astro";
+import SignupForm from "../../components/SignupForm.astro";
+import { getMethodPosts, methodPillars } from "../../lib/content";
+
+const published = new Set((await getMethodPosts()).map((p) => p.data.slug));
+---
+
+<BaseLayout
+  title="The Repeat Success Method"
+  description="A repeatable way to land new logos in four parts: Prioritize, People, Proof and Persistence. Plus the three-part first email."
+  footerSignup={false}
+>
+  <Section tone="band" labelledby="method-title">
+    <Eyebrow>The method</Eyebrow>
+    <h1 id="method-title">The Repeat Success Method</h1>
+    <p class="lede">
+      A repeatable way to land new logos: a short, researched, proof-based first email that earns a 15 to 20 minute
+      meeting, and the work around it.
+    </p>
+    <div class="grid grid-4 cards">
+      {
+        methodPillars.map((p) => (
+          <StepCard
+            numeral={p.numeral}
+            title={p.title}
+            href={published.has(p.slug) ? `/method/${p.slug}/` : undefined}
+            linkLabel="Read more"
+          >
+            {p.body}
+          </StepCard>
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section tone="cream" labelledby="framework-title">
+    <Eyebrow>The Repeat Success Framework</Eyebrow>
+    <h2 id="framework-title">Every first email has three parts. Nothing else.</h2>
+    <p class="lede">
+      You are not asking them to buy. You are asking whether a conversation is worth their time, which is a much
+      smaller ask and easier to say yes to.
+    </p>
+    <EmailAnatomy />
+  </Section>
+
+  <Section tone="band" labelledby="signup-title">
+    <div class="signup">
+      <h2 id="signup-title">Get the free guide.</h2>
+      <p class="lede">A template and three AI prompts that get replies.</p>
+      <SignupForm source="method-overview" />
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  .cards {
+    margin-top: 2.5rem;
+  }
+
+  .signup {
+    max-width: 720px;
+  }
+</style>

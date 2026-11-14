@@ -1,0 +1,116 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Section from "../components/Section.astro";
+import Button from "../components/Button.astro";
+import { site } from "../config/site";
+
+const bookingUrl = site.booking.url;
+---
+
+<BaseLayout
+  title="Book a 15 to 20 minute call"
+  description="Tell Kelsey about your team and what you're trying to land. Book a 15 to 20 minute call."
+>
+  <Section tone="cream" labelledby="book-title">
+    <div class="book">
+      <h1 id="book-title">Book a 15 to 20 minute call</h1>
+      <p class="lede">
+        Tell me about your team and what you're trying to land. If I can help, we'll figure out how. If not, I'll point
+        you somewhere useful.
+      </p>
+
+      {
+        bookingUrl ? (
+          <div class="button-row">
+            <Button href={bookingUrl} external>
+              Choose a time
+            </Button>
+          </div>
+        ) : (
+          <div class="fallback">
+            <p>
+              <strong>Booking opens soon.</strong> Email{" "}
+              <span class="email" data-email>
+                {site.email.hello}
+              </span>
+            </p>
+            <button type="button" class="copy" data-copy hidden>
+              Copy email address
+            </button>
+            <p class="copied" role="status" aria-live="polite" data-copied></p>
+          </div>
+        )
+      }
+    </div>
+  </Section>
+</BaseLayout>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>("[data-copy]");
+  const email = document.querySelector<HTMLElement>("[data-email]");
+  const status = document.querySelector<HTMLElement>("[data-copied]");
+
+  if (button && email && status && navigator.clipboard) {
+    button.hidden = false;
+    button.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(email.textContent?.trim() ?? "");
+        status.textContent = "Copied.";
+      } catch {
+        status.textContent = "Couldn't copy. Select the address above instead.";
+      }
+    });
+  }
+</script>
+
+<style>
+  .book {
+    max-width: 760px;
+  }
+
+  .fallback {
+    margin-top: 2rem;
+    padding: 1.5rem 1.75rem;
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-card);
+  }
+
+  .fallback p {
+    margin: 0;
+  }
+
+  .email {
+    font-weight: 600;
+    color: var(--color-heading);
+    user-select: all;
+    overflow-wrap: anywhere;
+  }
+
+  .copy {
+    margin-top: 1rem;
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1.5px solid var(--color-heading);
+    border-radius: var(--radius-button);
+    color: var(--color-heading);
+    font-family: var(--font-display);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .copy[hidden] {
+    display: none;
+  }
+
+  .copy:hover {
+    background: color-mix(in srgb, var(--color-heading) 6%, transparent);
+  }
+
+  .copied {
+    min-height: 1.5em;
+    margin-top: 0.5rem !important;
+    font-size: var(--step--1);
+  }
+</style>

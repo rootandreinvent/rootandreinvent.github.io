@@ -1,0 +1,252 @@
+---
+const parts = [
+  {
+    key: "reason",
+    label: "1 · The reason",
+    short: "Reason",
+    explain: "Their news, and why it matters. One specific reason from your research proves it wasn't sent to a thousand people.",
+  },
+  {
+    key: "proof",
+    label: "2 · The proof",
+    short: "Proof",
+    explain: "A similar customer, the challenge they had, and a measurable result. Same industry, ideally the same size.",
+  },
+  {
+    key: "ask",
+    label: "3 · The ask",
+    short: "Ask",
+    explain: "15 to 20 minutes, to see if you can repeat that success for them. Nothing bigger.",
+  },
+] as const;
+---
+
+<div class="anatomy" data-anatomy>
+  <figure class="email" aria-labelledby="email-anatomy-caption">
+    <figcaption id="email-anatomy-caption" class="fictional">
+      A made-up example. The company, customer and numbers are fictional.
+    </figcaption>
+    <div class="email-head">
+      <span class="field">Subject</span>
+      <span class="subject">Your second warehouse</span>
+    </div>
+    <div class="email-body">
+      <p>Hi Dana,</p>
+      <p>
+        <mark class="hl hl-reason" data-part="reason">
+          <span class="tag">Reason</span>
+          I saw Harlan Freight just opened a second warehouse. When another regional freight company did the same, their dispatchers were still planning routes by hand a year later.
+        </mark>
+      </p>
+      <p>
+        <mark class="hl hl-proof" data-part="proof">
+          <span class="tag">Proof</span>
+          They moved route planning into one system, and missed delivery windows dropped from about one in five to one in twenty, with the same number of drivers.
+        </mark>
+      </p>
+      <p>
+        <mark class="hl hl-ask" data-part="ask">
+          <span class="tag">Ask</span>
+          Would you be open to 15 to 20 minutes to see if we can repeat that for Harlan?
+        </mark>
+      </p>
+      <p>Thanks,<br />Alex</p>
+    </div>
+  </figure>
+
+  <ol class="legend" role="list">
+    {
+      parts.map((part) => (
+        <li class={`legend-item legend-${part.key}`}>
+          <button type="button" class="legend-btn" data-target={part.key} aria-pressed="false">
+            <span class={`swatch swatch-${part.key}`} aria-hidden="true" />
+            {part.label}
+          </button>
+          <p class="explain">{part.explain}</p>
+        </li>
+      ))
+    }
+  </ol>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-anatomy]").forEach((root) => {
+    const buttons = root.querySelectorAll<HTMLButtonElement>(".legend-btn");
+    const marks = root.querySelectorAll<HTMLElement>("[data-part]");
+
+    const select = (target: string | null) => {
+      root.classList.toggle("is-focused", target !== null);
+      buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.target === target)));
+      marks.forEach((m) => m.classList.toggle("is-active", m.dataset.part === target));
+    };
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const pressed = button.getAttribute("aria-pressed") === "true";
+        select(pressed ? null : button.dataset.target ?? null);
+      });
+    });
+  });
+</script>
+
+<style>
+  .anatomy {
+    display: grid;
+    gap: 2rem;
+    margin-top: 2.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .anatomy {
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
+  .email {
+    margin: 0;
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+  }
+
+  .fictional {
+    font-family: var(--font-display);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--color-gold-ink);
+    background: var(--hl-reason);
+    padding: 0.6rem 1.25rem;
+  }
+
+  .email-head {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    padding: 1rem 1.5rem;
+    border-bottom: 1.5px solid var(--color-border);
+  }
+
+  .field {
+    font-size: 0.8125rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-body);
+  }
+
+  .subject {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--color-heading);
+  }
+
+  .email-body {
+    padding: 1.5rem;
+    color: var(--color-heading);
+  }
+
+  .email-body p {
+    margin: 0 0 1rem;
+  }
+
+  .email-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  .hl {
+    display: block;
+    color: var(--color-heading);
+    padding: 0.75rem 0.9rem;
+    border-radius: 10px;
+    transition: opacity 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .hl-reason {
+    background: var(--hl-reason);
+  }
+  .hl-proof {
+    background: var(--hl-proof);
+  }
+  .hl-ask {
+    background: var(--hl-ask);
+  }
+
+  .tag {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-body);
+    margin-bottom: 0.2rem;
+  }
+
+  .anatomy.is-focused .hl:not(.is-active) {
+    opacity: 0.35;
+  }
+
+  .hl.is-active {
+    box-shadow: 0 0 0 2px var(--color-heading);
+  }
+
+  .legend {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .legend-item {
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-card);
+    padding: 1.1rem 1.25rem;
+  }
+
+  .legend-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 44px;
+    padding: 0.25rem 0;
+    background: none;
+    border: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--color-heading);
+    cursor: pointer;
+  }
+
+  .legend-btn[aria-pressed="true"] {
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+
+  .swatch {
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 4px;
+    border: 1.5px solid var(--color-border);
+  }
+  .swatch-reason {
+    background: var(--hl-reason);
+  }
+  .swatch-proof {
+    background: var(--hl-proof);
+  }
+  .swatch-ask {
+    background: var(--hl-ask);
+  }
+
+  .explain {
+    margin: 0.25rem 0 0;
+    font-size: 1rem;
+  }
+</style>

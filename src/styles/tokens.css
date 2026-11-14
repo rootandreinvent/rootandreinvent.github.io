@@ -1,0 +1,50 @@
+:root {
+  /* surfaces */
+  --color-bg:          #F6F1E7;  /* cream, main background */
+  --color-surface:     #FFFDF8;  /* warm white, cards */
+  --color-band:        #17342E;  /* deep green, hero/feature bands, footer */
+  --color-band-raised: #1F463E;  /* mid green, cards on dark bands */
+  --color-border:      #E2DACA;  /* sand rules and card borders */
+  --color-band-border: #2F5A50;  /* card borders on dark bands */
+
+  /* text */
+  --color-heading:     #17342E;
+  --color-body:        #3F514B;
+  --color-muted:       #6B7A74;  /* decorative only: below AA for small text on cream */
+  --color-on-band:     #CFE0D6;  /* body text on green */
+  --color-on-band-strong: #F6F1E7;
+
+  /* accents */
+  --color-gold:        #E3A92B;  /* buttons, numerals, key accents */
+  --color-gold-hover:  #D59C1F;  /* gold darkened ~6% */
+  --color-gold-ink:    #8A5A00;  /* gold-family text on cream (AA contrast) */
+  --color-teal:        #2E6B5A;  /* eyebrow labels, links */
+
+  /* email highlights (three-part framework) */
+  --hl-reason: #FBEBC2;
+  --hl-proof:  #D9ECE1;
+  --hl-ask:    #E4DDF0;
+
+  /* development-only TODO chips */
+  --color-todo-bg:  #FFE45C;
+  --color-todo-ink: #3A2E00;
+
+  /* type */
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body:    "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --step--1: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+  --step-0:  clamp(1.0625rem, 1.04rem + 0.12vw, 1.125rem);
+  --step-1:  clamp(1.2rem, 1.12rem + 0.4vw, 1.4rem);
+  --step-2:  clamp(1.45rem, 1.3rem + 0.75vw, 1.9rem);
+  --step-3:  clamp(1.8rem, 1.55rem + 1.3vw, 2.6rem);
+  --step-4:  clamp(2.25rem, 1.85rem + 2vw, 3.5rem);
+
+  /* layout */
+  --max-width: 1120px;
+  --measure: 66ch;
+  --radius-card: 16px;
+  --radius-button: 10px;
+  --space-section: clamp(4rem, 3rem + 5vw, 7rem);
+  --gutter: clamp(1.25rem, 0.9rem + 1.8vw, 2rem);
+}

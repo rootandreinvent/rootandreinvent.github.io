@@ -1,0 +1,179 @@
+---
+import Wordmark from "./Wordmark.astro";
+import SignupForm from "./SignupForm.astro";
+import PlaceholderNote from "./PlaceholderNote.astro";
+import { site } from "../config/site";
+import { url } from "../lib/url";
+
+interface Props {
+  showSignup?: boolean;
+}
+
+const { showSignup = true } = Astro.props;
+const year = new Date().getFullYear();
+
+const nav = [
+  { href: "/work-with-me/", label: "Work with me" },
+  { href: "/method/", label: "Method" },
+  { href: "/shop/", label: "Shop" },
+  { href: "/about/", label: "About" },
+  { href: "/guide/", label: "Free guide" },
+  { href: "/book/", label: "Book a call" },
+];
+---
+
+<footer class="site-footer">
+  <div class="container grid-footer">
+    <div class="brand-col">
+      <Wordmark variant="cream" size="lg" />
+      <p class="tagline">{site.tagline}</p>
+      <p class="contact">
+        <span class="contact-label">Email</span>
+        <span class="email">{site.email.hello}</span>
+      </p>
+      {
+        site.mailingAddress ? (
+          <p class="address">{site.mailingAddress}</p>
+        ) : (
+          <PlaceholderNote text="[TODO: mailing address (PO box or virtual mailbox)]" />
+        )
+      }
+    </div>
+
+    <nav class="footer-nav" aria-label="Footer">
+      <ul role="list">
+        {
+          nav.map((item) => (
+            <li>
+              <a href={url(item.href)}>{item.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="signup-col">
+      {
+        showSignup ? (
+          <>
+            <p class="signup-title">Get the free guide</p>
+            <SignupForm source="footer" compact />
+          </>
+        ) : (
+          <>
+            <p class="signup-title">Get the free guide</p>
+            <p>A template and three AI prompts that get replies.</p>
+            <a href={url("/guide/")}>Get the free guide &rarr;</a>
+          </>
+        )
+      }
+    </div>
+  </div>
+
+  <div class="container legal">
+    <p>&copy; {year} Root &amp; Reinvent</p>
+    <ul role="list">
+      <li><a href={url("/privacy/")}>Privacy</a></li>
+      <li><a href={url("/terms/")}>Terms</a></li>
+    </ul>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--color-band);
+    color: var(--color-on-band);
+    padding-block: 4rem 2rem;
+    border-top: 1.5px solid var(--color-band-border);
+  }
+
+  .grid-footer {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  @media (min-width: 900px) {
+    .grid-footer {
+      grid-template-columns: 1.1fr 0.7fr 1.4fr;
+    }
+  }
+
+  .tagline {
+    margin: 0.9rem 0 1.5rem;
+    color: var(--color-on-band);
+  }
+
+  .contact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    margin: 0 0 0.75rem;
+  }
+
+  .contact-label {
+    font-family: var(--font-display);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+  }
+
+  .email {
+    color: var(--color-on-band-strong);
+    user-select: all;
+  }
+
+  .footer-nav ul,
+  .legal ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .footer-nav ul {
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  .site-footer a {
+    color: var(--color-on-band-strong);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .site-footer a:hover {
+    text-decoration: underline;
+  }
+
+  .signup-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--step-1);
+    color: var(--color-on-band-strong);
+    margin: 0 0 0.75rem;
+  }
+
+  .legal {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-band-border);
+    font-size: var(--step--1);
+  }
+
+  .legal p {
+    margin: 0;
+  }
+
+  .legal ul {
+    display: flex;
+    gap: 1.25rem;
+  }
+</style>

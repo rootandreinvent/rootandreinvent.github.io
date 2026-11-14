@@ -1,0 +1,191 @@
+---
+import { site } from "../config/site";
+import { url } from "../lib/url";
+
+interface Props {
+  /** Where the signup came from, e.g. "guide-page". Sent to Kit so Kelsey can compare channels. */
+  source: string;
+  tag?: string;
+  buttonLabel?: string;
+  compact?: boolean;
+  id?: string;
+}
+
+const { source, tag, buttonLabel = "Send me the free guide", compact = false, id } = Astro.props;
+const action = site.signup.formActionUrl;
+const enabled = Boolean(action);
+const fieldId = `email-${source}`;
+const errorId = `${fieldId}-error`;
+const noteId = `${fieldId}-note`;
+---
+
+<form
+  class:list={["signup", { compact }]}
+  id={id}
+  method="post"
+  action={action ?? undefined}
+  novalidate
+  data-signup
+>
+  <div class="row">
+    <label for={fieldId} class="label">Email address</label>
+    <div class="controls">
+      <input
+        id={fieldId}
+        name="email_address"
+        type="email"
+        autocomplete="email"
+        inputmode="email"
+        required
+        placeholder="you@company.com"
+        disabled={!enabled}
+        aria-describedby={`${errorId} ${noteId}`}
+      />
+      <button class="submit" type="submit" disabled={!enabled}>{buttonLabel}</button>
+    </div>
+  </div>
+  <input type="hidden" name="fields[source]" value={source} />
+  {tag && <input type="hidden" name="fields[signup_tag]" value={tag} />}
+  <p class="error" id={errorId} role="alert" hidden>Enter a valid email address.</p>
+  <p class="note" id={noteId}>
+    {enabled ? null : <strong>Signups open soon. </strong>}
+    We'll only use your email to send what you asked for. See the <a href={url("/privacy/")}>privacy policy</a>.
+  </p>
+</form>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>("form[data-signup]").forEach((form) => {
+    const input = form.querySelector<HTMLInputElement>('input[type="email"]');
+    const error = form.querySelector<HTMLElement>(".error");
+    if (!input || !error) return;
+
+    const validate = () => {
+      const ok = input.checkValidity();
+      error.hidden = ok;
+      input.setAttribute("aria-invalid", String(!ok));
+      return ok;
+    };
+
+    input.addEventListener("blur", () => {
+      if (input.value) validate();
+    });
+
+    form.addEventListener("submit", (event) => {
+      if (!validate()) {
+        event.preventDefault();
+        input.focus();
+      }
+    });
+  });
+</script>
+
+<style>
+  .signup {
+    width: 100%;
+    max-width: 560px;
+  }
+
+  .label {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 0.4rem;
+    color: var(--color-heading);
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  input[type="email"] {
+    flex: 1 1 15rem;
+    min-height: 48px;
+    padding: 0.7rem 0.9rem;
+    font: inherit;
+    font-size: 1rem;
+    color: var(--color-heading);
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-button);
+  }
+
+  input[type="email"]:focus-visible {
+    outline: 3px solid var(--color-teal);
+    outline-offset: 2px;
+    border-color: var(--color-teal);
+  }
+
+  input[aria-invalid="true"] {
+    border-color: var(--color-gold-ink);
+  }
+
+  .submit {
+    flex: 0 0 auto;
+    min-height: 48px;
+    padding: 0.75rem 1.35rem;
+    border-radius: var(--radius-button);
+    border: 1.5px solid var(--color-gold);
+    background: var(--color-gold);
+    color: var(--color-band);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
+  .submit:hover:not([disabled]) {
+    background: var(--color-gold-hover);
+  }
+
+  .submit[disabled],
+  input[disabled] {
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+
+  .error {
+    margin: 0.5rem 0 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-gold-ink);
+  }
+
+  .note {
+    margin: 0.75rem 0 0;
+    font-size: var(--step--1);
+    color: var(--color-body);
+  }
+
+  :global(.tone-band) .label,
+  :global(.site-footer) .label {
+    color: var(--color-on-band-strong);
+  }
+
+  :global(.tone-band) .note,
+  :global(.site-footer) .note {
+    color: var(--color-on-band);
+  }
+
+  :global(.tone-band) .note a,
+  :global(.site-footer) .note a {
+    color: var(--color-on-band-strong);
+  }
+
+  :global(.tone-band) .error,
+  :global(.site-footer) .error {
+    color: var(--color-gold);
+  }
+
+  :global(.tone-band) input[type="email"]:focus-visible,
+  :global(.site-footer) input[type="email"]:focus-visible {
+    outline-color: var(--color-gold);
+    border-color: var(--color-gold);
+  }
+
+  .compact .label {
+    font-size: 0.9rem;
+  }
+</style>

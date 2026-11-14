@@ -1,0 +1,41 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Section from "../../components/Section.astro";
+import Button from "../../components/Button.astro";
+import { getMethodPosts } from "../../lib/content";
+import { url } from "../../lib/url";
+
+const prioritize = (await getMethodPosts()).find((p) => p.data.slug === "prioritize");
+---
+
+<BaseLayout
+  title="Check your inbox"
+  description="Confirm your email to get the free guide."
+  noindex
+  footerSignup={false}
+>
+  <Section tone="cream" labelledby="thanks-title">
+    <div class="thanks">
+      <h1 id="thanks-title">Check your inbox to confirm.</h1>
+      <p class="lede">Your guide is on the way.</p>
+      {
+        prioritize ? (
+          <p>
+            While you wait, read: <a href={url("/method/prioritize/")}>Prioritize: who to call first</a>.
+          </p>
+        ) : (
+          <div class="button-row">
+            <Button href="/method/" variant="secondary">Read about the method</Button>
+          </div>
+        )
+      }
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  .thanks {
+    max-width: 720px;
+    padding-block: 2rem;
+  }
+</style>
